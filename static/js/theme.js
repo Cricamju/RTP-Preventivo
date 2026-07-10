@@ -1,29 +1,41 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Referencias a los elementos del Menú
+// Al estar inyectado al final del body, el código se ejecuta de inmediato sin bloqueos
+(function initAccessibility() {
     const fab = document.getElementById('a11y-fab');
     const menu = document.getElementById('a11y-menu');
     const themeToggleBtn = document.getElementById('btn-theme-toggle');
+    const btnTextIncrease = document.getElementById('btn-text-increase');
+    const btnTextDecrease = document.getElementById('btn-text-decrease');
+    const btnFontToggle = document.getElementById('btn-font-toggle');
+    const btnVoiceToggle = document.getElementById('btn-voice-toggle');
     const body = document.body;
 
-    if (!fab || !menu) return;
+    if (!fab || !menu) return; // Si no encuentra el menú, se detiene por seguridad
 
     // =========================================
-    // 1. REPARACIÓN DEL TEMA (Cargar de memoria)
+    // 1. CARGAR MEMORIA DEL NAVEGADOR
     // =========================================
-    const currentTheme = localStorage.getItem('rtp-theme');
-    if (currentTheme === 'light') {
+    // Tema Claro/Oscuro
+    if (localStorage.getItem('rtp-theme') === 'light') {
         body.classList.add('light-theme');
     }
 
+    // Tamaño de texto
+    let currentTextSize = parseInt(localStorage.getItem('rtp-text-size')) || 100;
+    document.documentElement.style.fontSize = `${currentTextSize}%`;
+
+    // Fuente Accesible
+    if (localStorage.getItem('rtp-font') === 'dyslexia') {
+        body.classList.add('dyslexia-mode');
+    }
+
     // =========================================
-    // 2. ABRIR / CERRAR EL MENÚ
+    // 2. ABRIR Y CERRAR EL MENÚ 
     // =========================================
     fab.addEventListener('click', (e) => {
-        e.stopPropagation(); // Evita que se cierre instantáneamente
+        e.stopPropagation();
         menu.classList.toggle('show');
     });
 
-    // Cierra el menú al hacer clic en cualquier lugar fuera de él
     document.addEventListener('click', (e) => {
         if (menu.classList.contains('show') && !menu.contains(e.target) && !fab.contains(e.target)) {
             menu.classList.remove('show');
@@ -31,34 +43,42 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =========================================
-    // 3. LÓGICA DE LOS BOTONES DE ACCESIBILIDAD
+    // 3. FUNCIONES DE LOS BOTONES
     // =========================================
-
-    // Alternar Tema (Arreglado)
+    
+    // Cambiar Tema
     themeToggleBtn.addEventListener('click', () => {
         body.classList.toggle('light-theme');
-        
-        if (body.classList.contains('light-theme')) {
-            localStorage.setItem('rtp-theme', 'light');
-        } else {
-            localStorage.setItem('rtp-theme', 'dark');
+        localStorage.setItem('rtp-theme', body.classList.contains('light-theme') ? 'light' : 'dark');
+    });
+
+    // Aumentar Letra (Límite 130%)
+    btnTextIncrease.addEventListener('click', () => {
+        if (currentTextSize < 130) {
+            currentTextSize += 10;
+            document.documentElement.style.fontSize = `${currentTextSize}%`;
+            localStorage.setItem('rtp-text-size', currentTextSize);
         }
     });
 
-    // Bases para futuras funciones (Aún no programadas, pero listas para detectar clics)
-    document.getElementById('btn-text-increase').addEventListener('click', () => {
-        console.log("Subir tamaño de letra - Pendiente de programar");
+    // Disminuir Letra (Límite 80%)
+    btnTextDecrease.addEventListener('click', () => {
+        if (currentTextSize > 80) {
+            currentTextSize -= 10;
+            document.documentElement.style.fontSize = `${currentTextSize}%`;
+            localStorage.setItem('rtp-text-size', currentTextSize);
+        }
     });
 
-    document.getElementById('btn-text-decrease').addEventListener('click', () => {
-        console.log("Bajar tamaño de letra - Pendiente de programar");
+    // Cambiar a Fuente Legible
+    btnFontToggle.addEventListener('click', () => {
+        body.classList.toggle('dyslexia-mode');
+        localStorage.setItem('rtp-font', body.classList.contains('dyslexia-mode') ? 'dyslexia' : 'default');
     });
 
-    document.getElementById('btn-font-toggle').addEventListener('click', () => {
-        console.log("Alternar fuente para Dislexia - Pendiente de programar");
+    // Lector de voz (Por programar después)
+    btnVoiceToggle.addEventListener('click', () => {
+        alert("La función de lectura de pantalla se integrará próximamente.");
     });
 
-    document.getElementById('btn-voice-toggle').addEventListener('click', () => {
-        console.log("Activar lector de voz - Pendiente de programar");
-    });
-});
+})();
