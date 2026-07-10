@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soporte | RTP-Preventivo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base_public.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/support.css') }}">
+</head>
+<body>
+
+    <div class="overlay"></div>
+
+    <header class="glass-panel">
+        <img src="{{ url_for('static', filename='logo-rtp.png') }}" alt="Logo Oficial RTP" class="header-logo">
+        <h1>RED DE TRANSPORTE DE PASAJEROS</h1>
+    </header>
+
+    <main>
+        <div class="support-card">
+            <h2>Centro de Ayuda RTP</h2>
+            <p>Selecciona una de las opciones frecuentes para resolver problemas de acceso al sistema RTP-Preventivo de control de flota.</p>
+
+            <details>
+                <summary>He olvidado mi contraseña</summary>
+                <div class="faq-content">
+                    Por políticas de seguridad, las contraseñas no pueden recuperarse automáticamente por correo. Debes comunicarte con el <strong>Departamento de Informática (Extensión 1234)</strong> o solicitar a tu Jefe de Taller que levante un ticket para el reseteo manual de tus credenciales.
+                </div>
+            </details>
+
+            <details>
+                <summary>Mi usuario aparece bloqueado</summary>
+                <div class="faq-content">
+                    El sistema bloquea automáticamente las cuentas tras <strong>3 intentos fallidos</strong> de inicio de sesión. El bloqueo es temporal y se liberará tras 15 minutos. Si el problema persiste, contacta al administrador del sistema.
+                </div>
+            </details>
+
+            <details>
+                <summary>¿Cómo solicito acceso para un usuario nuevo?</summary>
+                <div class="faq-content">
+                    El alta de personal (Mecánicos, Jefes de Taller, Secretarias) debe tramitarse mediante el <strong>Formato Institucional de Acceso a Sistemas</strong>, firmado por Recursos Humanos y entregado físicamente en las oficinas centrales de Informática.
+                </div>
+            </details>
+
+            <details>
+                <summary>¿Puedo acceder a RTP-Preventivo desde mi casa?</summary>
+                <div class="faq-content">
+                    <strong>No.</strong> Esta es una red tipo Intranet. Por seguridad de los datos de la flota, el acceso está restringido exclusivamente a las computadoras conectadas a la red local de los talleres de RTP y oficinas administrativas.
+                </div>
+            </details>
+
+            <a href="{{ url_for('login') }}" class="back-btn">← Regresar al inicio de sesión</a>
+        </div>
+    </main>
+
+    <footer class="glass-panel">
+        &copy; 2026 RED DE TRANSPORTE DE PASAJEROS | Departamento de Sistemas
+    </footer>
+
+        <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    {% include 'components/fab.html' %}
+</body>
+</html>

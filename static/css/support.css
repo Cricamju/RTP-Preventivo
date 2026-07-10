@@ -1,0 +1,137 @@
+/* static/css/support.css */
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;      
+    justify-content: flex-start; 
+    align-items: center;         
+    padding: 40px 20px;
+}
+
+.support-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 600px; /* Más ancho que el login para que quepa bien el texto */
+    box-sizing: border-box;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.support-card h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--rtp-green);
+    font-size: 1.5rem;
+}
+
+.support-card > p {
+    color: var(--text-muted);
+    margin-bottom: 30px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Estilos del Acordeón Nativo (FAQ) */
+details {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    transition: background 0.3s ease;
+}
+
+details:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+summary {
+    padding: 15px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none; /* Oculta la flecha por defecto en algunos navegadores */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-light);
+}
+
+/* Flecha personalizada */
+summary::after {
+    content: '▼';
+    font-size: 0.8rem;
+    color: var(--rtp-green);
+    transition: transform 0.3s ease;
+}
+
+details[open] summary::after {
+    transform: rotate(180deg);
+}
+
+.faq-content {
+    padding: 0 20px 20px 20px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.faq-content a {
+    color: var(--rtp-green);
+    text-decoration: none;
+}
+
+.faq-content a:hover {
+    text-decoration: underline;
+}
+
+/* Botón de regreso */
+.back-btn {
+    display: inline-block;
+    margin-top: 25px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background 0.3s;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+body.light-theme details {
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(0, 147, 69, 0.2);
+    color: #334155;
+}
+
+body.light-theme details:hover {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+body.light-theme .faq-content {
+    color: #1e293b;
+}
+
+body.light-theme .back-btn {
+    background: var(--rtp-green);
+    color: white;
+}
+
+body.light-theme .back-btn:hover {
+    background: var(--rtp-green-hover);
+}
+
+@media (max-width: 600px) {
+    header {
+        flex-direction: column;
+        padding: 15px;
+        text-align: center;
+    }
+}

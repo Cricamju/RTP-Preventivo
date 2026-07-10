@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | RTP-Preventivo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base_public.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+
+    <div class="overlay"></div>
+
+    <header class="glass-panel">
+        <img src="{{ url_for('static', filename='logo-rtp.png') }}" alt="Logo Oficial RTP" class="header-logo">
+        <h1>RED DE TRANSPORTE DE PASAJEROS</h1>
+    </header>
+
+    <main>
+        <div class="login-card">
+            <h2>Acceder a RTP-Preventivo</h2>
+            
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="username">Login:</label>
+                    <input type="text" id="username" name="username" required autocomplete="off">
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+              <div class="actions-container">
+                <button type="submit" class="btn btn-primary">Entrar</button>
+                <button type="button" id="btn-limpiar" class="btn btn-secondary">Limpiar</button>
+                
+                <a href="https://rtp.cdmx.gob.mx" target="_blank" class="support-link">Más sobre RTP</a>
+                <a href="{{ url_for('login_support') }}" class="support-link">¿Necesitas Ayuda?</a>
+            </div>
+            </div>
+    </main>
+
+    <footer class="glass-panel">
+        &copy; 2026 RED DE TRANSPORTE DE PASAJEROS
+    </footer>
+
+        <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    {% include 'components/fab.html' %}
+</body>
+</html>

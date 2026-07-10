@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Intranet{% endblock %} | RTP-Preventivo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base_private.css') }}">
+</head>
+<body>
+
+    <div class="overlay"></div>
+
+    <header>
+        <button id="menu-btn" class="menu-toggle">☰</button>
+        <img src="{{ url_for('static', filename='logo-rtp.png') }}" alt="Logo Oficial RTP" class="header-logo">
+        <h1>SISTEMA DE MANTENIMIENTO RTP</h1>
+    </header>
+
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-nav">
+            <a href="/dashboard" class="sidebar-link active">Inicio</a>
+            <a href="/odometro" class="sidebar-link">Captura de Odómetro</a>
+            <a href="/gsp" class="sidebar-link">Módulo GSP (Preventivo)</a>
+            <a href="/correctivo" class="sidebar-link">Órdenes de Reparación</a>
+            <a href="/reportes" class="sidebar-link">Generar Reportes</a>
+        </div>
+        
+        <div class="sidebar-bottom">
+            <a href="/" class="sidebar-link">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <main class="content-area">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    {% include 'components/fab.html' %}
+</body>
+</html>

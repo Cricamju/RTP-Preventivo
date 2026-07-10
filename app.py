@@ -1,16 +1,21 @@
-from flask import Flask, request, jsonify
+# IMPORTANTE: Agregamos 'render_template' a la lista de importaciones
+from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
 
-# 1. Ruta principal (La cara de la aplicación)
+# 1. Ruta principal (Pantalla de Login - La cara de la aplicación)
 @app.route('/')
-def index():
-    # Por ahora devolvemos un texto simple para probar que el servidor sirve.
-    # Después, el Chat de Frontend cambiará esto por el HTML con la tabla.
-    return "<h1>¡Servidor Flask de RTP funcionando!</h1><p>Esperando la interfaz de captura...</p>"
+def login():
+    # Flask buscará automáticamente 'login.html' dentro de la carpeta 'templates'
+    return render_template('login.html')
 
-# 2. Ruta API (El receptor de datos)
-# Aquí es donde el Frontend de Cristofer mandará la tabla con los colores
+# 2. Ruta para el Dashboard del Odómetro (La zona de captura)
+@app.route('/odometro')
+def odometro():
+    return render_template('index.html')
+
+# 3. Ruta API (El receptor de datos)
+# Aquí es donde el Frontend mandará la tabla con los colores
 @app.route('/api/guardar_odometro', methods=['POST'])
 def guardar_odometro():
     try:
@@ -21,7 +26,7 @@ def guardar_odometro():
         print("¡Datos recibidos desde la web!")
         print(datos_recibidos)
         
-        # Aquí es donde conectaremos la magia de PostgreSQL más adelante
+        # Aquí es donde conectaremos la magia de PostgreSQL con Merari más adelante
         
         return jsonify({
             "status": "success", 
@@ -35,7 +40,14 @@ def guardar_odometro():
             "mensaje": str(e)
         }), 500
 
+@app.route('/soporte-login')
+def login_support():
+    return render_template('login-support.html')
+
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('base.html')
+
 if __name__ == '__main__':
-    # Arrancamos el servidor en modo Debug para que los cambios se guarden en tiempo real
-    # El puerto por defecto es el 5000
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True)
