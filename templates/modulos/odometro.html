@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Captura de Odómetro{% endblock %}
+
+{% block content %}
+<!-- Vinculamos el CSS específico de este módulo -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/odometro.css') }}">
+
+<div class="odometro-container">
+    <h1>Captura de Odómetro</h1>
+
+    <div id="dropzone" class="paste-zone" tabindex="0">
+        <h3>Haz clic aquí y presiona Ctrl + V</h3>
+        <p id="zone-status">Esperando datos de la tabla de Excel...</p>
+    </div>
+
+    <div id="table-container" class="table-container">
+        <table id="preview-table">
+            <thead>
+                <tr id="table-header"></tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
+    </div>
+
+    <div id="actions" class="actions">
+        <button id="btn-submit" class="btn-guardar">Guardar en Base de Datos</button>
+    </div>
+</div>
+
+<div id="toast">Mensaje de sistema</div>
+
+<!-- El JavaScript se queda aquí al final para que la tabla siga funcionando -->
+<script>
+    const dropzone = document.getElementById('dropzone');
+    const statusText = document.getElementById('zone-status');
+    const tableContainer = document.getElementById('table-container');
+    const tableHeader = document.getElementById('table-header');
+    const tableBody = document.getElementById('table-body');
+    const actionsContainer = document.getElementById('actions');
+    const btnSubmit = document.getElementById('btn-submit');
+    const toast = document.getElementById('toast');
+
+    let odometerData = [];
+
+    function showToast(message, type = 'success') {
+        toast.textContent = message;
+        toast.className = `show ${type}`;
+        setTimeout(() => {
+            toast.className = toast.className.replace('show', '').trim();
+        }, 4000);
+    }
+
+    dropzone.addEventListener('paste', (event) => {
+        event.preventDefault();
+        const htmlData = event.clipboardData.getData('text/html');
+
+        if (!htmlData) {
+            showToast('No se detectó una tabla en el portapapeles.', 'error');
+            return;
+        }
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlData, 'text/html');
+        const table = doc.querySelector('table');
+
+        if (!table) {
+            showToast('El formato copiado no es una tabla válida.', 'error');
+            return;
+        }
+        extractDataFromTable(table);
+    });
+
+    function extractDataFromTable(table) {
+        odometerData = []; 
+        tableHeader.innerHTML = '';
+        tableBody.innerHTML = '';
+        const rows = table.querySelectorAll('tr');
+
+        rows.forEach((row, index) => {
+            const cells = row.querySelectorAll('td, th');
+            if (cells.length === 0) return; 
+
+            const rowData = {
+                cells: Array.from(cells).map(cell => cell.innerText.trim())
+            };
+
+            if (index === 0) {
+                rowData.cells.forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText || 'Columna';
+                    tableHeader.appendChild(th);
+                });
+            } else {
+                odometerData.push(rowData);
+                const tr = document.createElement('tr');
+                
+                rowData.cells.forEach(cellText => {
+                    const td = document.createElement('td');
+                    td.textContent = cellText;
+                    tr.appendChild(td);
+                });
+                tableBody.appendChild(tr);
+            }
+        });
+
+        if (odometerData.length > 0) {
+            statusText.textContent = `¡Datos cargados! ${odometerData.length} filas detectadas.`;
+            tableContainer.style.display = 'block';
+            actionsContainer.style.display = 'block';
+            showToast('Tabla procesada correctamente', 'success');
+        }
+    }
+
+    btnSubmit.addEventListener('click', async () => {
+        btnSubmit.disabled = true;
+        btnSubmit.textContent = 'Enviando...';
+
+        try {
+            const response = await fetch('/api/guardar_odometro', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ payload: odometerData })
+            });
+
+            if (response.ok) {
+                showToast('¡Datos guardados exitosamente!', 'success');
+                setTimeout(() => {
+                    tableContainer.style.display = 'none';
+                    actionsContainer.style.display = 'none';
+                    statusText.textContent = 'Esperando nuevos datos...';
+                    btnSubmit.disabled = false;
+                    btnSubmit.textContent = 'Guardar en Base de Datos';
+                    dropzone.focus();
+                }, 2000);
+            } else {
+                throw new Error('Error en el servidor');
+            }
+        } catch (error) {
+            showToast('Error de conexión con el backend.', 'error');
+            btnSubmit.disabled = false;
+            btnSubmit.textContent = 'Reintentar Guardado';
+        }
+    });
+</script>
+{% endblock %}

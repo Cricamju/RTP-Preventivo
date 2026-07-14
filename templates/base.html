@@ -6,7 +6,8 @@
     <title>{% block title %}Intranet{% endblock %} | RTP-Preventivo</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base_private.css') }}">
 </head>
-<body>
+<!-- Inyectamos la variable 'role' para cambiar el fondo dinámicamente -->
+<body class="theme-{{ role }}">
 
     <div class="overlay"></div>
 
@@ -18,10 +19,20 @@
 
     <nav id="sidebar" class="sidebar">
         <div class="sidebar-nav">
-            <a href="{{ url_for('main.dashboard_admin') }}" class="sidebar-link active">Inicio</a>            <a href="/odometro" class="sidebar-link">Captura de Odómetro</a>
-            <a href="/gsp" class="sidebar-link">Módulo GSP (Preventivo)</a>
-            <a href="/correctivo" class="sidebar-link">Órdenes de Reparación</a>
-            <a href="/reportes" class="sidebar-link">Generar Reportes</a>
+            <!-- Botón de Inicio dinámico basado en el rol -->
+            <a href="/dashboard/{{ role }}" class="sidebar-link active">Inicio</a>
+            
+            <!-- Módulos operativos: Solo para Admin y Editor -->
+            {% if role == 'admin' or role == 'editor' %}
+                <a href="/odometro" class="sidebar-link">Captura de Odómetro</a>
+                <a href="/gsp" class="sidebar-link">Módulo GSP (Preventivo)</a>
+                <a href="/correctivo" class="sidebar-link">Órdenes de Reparación</a>
+            {% endif %}
+
+            <!-- Módulo de consultas: Solo para Admin y Consulta -->
+            {% if role == 'admin' or role == 'consulta' %}
+                <a href="/reportes" class="sidebar-link">Generar Reportes</a>
+            {% endif %}
         </div>
         
         <div class="sidebar-bottom">
@@ -33,6 +44,7 @@
         {% block content %}
         {% endblock %}
     </main>
+    
     {% include 'components/footer.html' %}
     {% include 'components/fab.html' %}
 

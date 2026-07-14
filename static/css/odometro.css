@@ -1,0 +1,124 @@
+/* static/css/odometro.css */
+
+.odometro-container {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 900px;
+    padding: 40px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    color: var(--text-light);
+}
+
+.odometro-container h1 {
+    margin-top: 0;
+    font-size: 24px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+    color: var(--rtp-green);
+}
+
+/* Zona de Pegado (Dropzone) */
+.paste-zone {
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 50px 20px;
+    text-align: center;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    outline: none;
+    margin-bottom: 30px;
+}
+
+.paste-zone:focus, .paste-zone:hover {
+    border-color: var(--rtp-green);
+    background-color: rgba(0, 147, 69, 0.1);
+    box-shadow: 0 0 0 4px rgba(0, 147, 69, 0.15);
+}
+
+.paste-zone h3 {
+    margin: 0 0 10px 0;
+    color: var(--rtp-green);
+}
+
+.paste-zone p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+/* Tabla de Vista Previa */
+.table-container {
+    display: none;
+    margin-top: 20px;
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th, td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 14px;
+}
+
+th {
+    background-color: rgba(255, 255, 255, 0.1);
+    font-weight: 600;
+}
+
+/* Botones y Acciones */
+.actions {
+    display: none;
+    margin-top: 20px;
+    text-align: right;
+}
+
+.btn-guardar {
+    background-color: var(--rtp-green);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 14px;
+}
+
+.btn-guardar:hover { background-color: var(--rtp-green-hover); }
+.btn-guardar:disabled { background-color: #64748b; cursor: not-allowed; }
+
+/* Notificación Flotante (Toast) */
+#toast {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 16px;
+    position: fixed;
+    z-index: 3000;
+    bottom: 30px;
+    right: 30px;
+    opacity: 0;
+    transition: opacity 0.3s, bottom 0.3s;
+}
+#toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+#toast.success { border-left: 5px solid #10b981; }
+#toast.error { border-left: 5px solid #ef4444; }

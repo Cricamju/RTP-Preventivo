@@ -266,3 +266,38 @@ footer.glass-panel {
     margin-top: auto; /* Empuja el footer hasta abajo */
     z-index: 10;
 }
+
+/* =========================================
+   FONDOS DE PANTALLA POR ROL
+   ========================================= */
+body.theme-admin {
+    background-image: url('../RTP-Admin.png');
+}
+
+body.theme-editor {
+    background-image: url('../RTP-Editor.png');
+}
+
+body.theme-consulta {
+    background-image: url('../RTP-Consulta.png');
+}
+
+/* Tarjeta de bienvenida para los dashboards */
+.welcome-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-card h2 {
+    color: var(--rtp-green);
+    margin-top: 0;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+}

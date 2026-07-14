@@ -19,15 +19,22 @@ def login_support():
 # ==========================================
 @main_bp.route('/dashboard/admin')
 def dashboard_admin():
-    return render_template('base.html', role='admin')
+    # Notar el cambio de ruta hacia la carpeta dashboards/
+    return render_template('dashboards/dashboard_admin.html', role='admin')
 
 @main_bp.route('/dashboard/editor')
 def dashboard_editor():
-    return render_template('base.html', role='editor')
+    return render_template('dashboards/dashboard_editor.html', role='editor')
 
 @main_bp.route('/dashboard/consulta')
 def dashboard_consulta():
-    return render_template('base.html', role='consulta')
+    return render_template('dashboards/dashboard_consulta.html', role='consulta')
+
+# Módulo de Captura
+@main_bp.route('/odometro')
+def odometro():
+    # Mandamos 'editor' temporalmente para que el HTML sepa qué fondo y menú pintar
+    return render_template('modulos/odometro.html', role='editor')
 
 # ==========================================
 # RUTAS DE API (Automatización de Excel)
