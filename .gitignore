@@ -1,0 +1,47 @@
+# =========================
+# Entornos Virtuales
+# =========================
+venv/
+env/
+.venv/
+
+# =========================
+# Archivos de Python / Flask
+# =========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+instance/
+
+# =========================
+# Variables de Entorno y Credenciales
+# (¡CRÍTICO PARA MERARI Y POSTGRESQL!)
+# =========================
+.env
+.env.local
+.flaskenv
+
+# =========================
+# Bases de Datos Locales
+# =========================
+*.db
+*.sqlite3
+
+# =========================
+# Archivos Temporales y de Sistema
+# =========================
+# Windows
+Thumbs.db
+desktop.ini
+# Linux / Ubuntu
+*~
+# Archivos bloqueados de Excel / LibreOffice (Como los del RAT Y PVO)
+.~lock.*
+*.tmp
+
+# =========================
+# Editores de Código
+# =========================
+.vscode/
+.idea/
