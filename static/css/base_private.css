@@ -30,7 +30,8 @@ body {
     min-height: 100vh;
     color: var(--text-light);
     overflow-x: hidden;
-    display: flex; /* Usamos flex para posicionar el sidebar y el contenido */
+    display: flex;
+    flex-direction: column;
 }
 
 .overlay {
@@ -143,9 +144,9 @@ header h1 { margin: 0; font-size: 1.2rem; color: var(--rtp-green); letter-spacin
    ZONA DE CONTENIDO Y FAB
    ========================================= */
 main.content-area {
+    margin-left: 260px;
     padding: 40px;
     flex: 1;
-    width: 100%;
 }
 
 /* =========================================
@@ -248,9 +249,20 @@ body.light-theme .a11y-action-btn:hover {
 /* =========================================
    ZONA DE CONTENIDO DINÁMICO
    ========================================= */
-main.content-area {
-    margin-left: 260px; /* Empuja el contenido a la derecha para no pisar el sidebar */
-    padding: 40px;
-    flex: 1; /* Toma todo el ancho restante */
-    min-height: calc(100vh - 85px);
+
+/* =========================================
+   FOOTER (Plantilla Maestra)
+   ========================================= */
+footer.glass-panel {
+    padding: 15px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    width: 100%;
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--glass-border);
+    margin-top: auto; /* Empuja el footer hasta abajo */
+    z-index: 10;
 }

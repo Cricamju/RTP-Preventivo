@@ -18,15 +18,14 @@
 
     <nav id="sidebar" class="sidebar">
         <div class="sidebar-nav">
-            <a href="/dashboard" class="sidebar-link active">Inicio</a>
-            <a href="/odometro" class="sidebar-link">Captura de Odómetro</a>
+            <a href="{{ url_for('main.dashboard_admin') }}" class="sidebar-link active">Inicio</a>            <a href="/odometro" class="sidebar-link">Captura de Odómetro</a>
             <a href="/gsp" class="sidebar-link">Módulo GSP (Preventivo)</a>
             <a href="/correctivo" class="sidebar-link">Órdenes de Reparación</a>
             <a href="/reportes" class="sidebar-link">Generar Reportes</a>
         </div>
         
         <div class="sidebar-bottom">
-            <a href="/" class="sidebar-link">Cerrar Sesión</a>
+            <a href="{{ url_for('main.login') }}" class="sidebar-link">Cerrar Sesión</a>
         </div>
     </nav>
 
@@ -34,7 +33,28 @@
         {% block content %}
         {% endblock %}
     </main>
-    
+    {% include 'components/footer.html' %}
     {% include 'components/fab.html' %}
+
+    <script>
+        const menuBtn = document.getElementById('menu-btn');
+        const sidebar = document.getElementById('sidebar');
+
+        if (menuBtn && sidebar) {
+            // Abrir menú al hacer clic en ☰
+            menuBtn.addEventListener('click', (event) => {
+                event.stopPropagation(); // Evita que se cierre instantáneamente
+                sidebar.classList.toggle('open');
+            });
+
+            // Cerrar menú al hacer clic en el área vacía (fuera del menú)
+            document.addEventListener('click', (event) => {
+                if (sidebar.classList.contains('open') && !sidebar.contains(event.target) && event.target !== menuBtn) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        }
+    </script>
+    
 </body>
 </html>
