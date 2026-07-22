@@ -18,7 +18,7 @@ body {
     padding: 0;
     padding-top: 85px;
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background-image: url('../RTP-Login.png');
+    background-image: url('../img/fondos/public/RTP-Login-Dark.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -62,16 +62,26 @@ header {
     width: 100%;            
     box-sizing: border-box; 
     z-index: 1000;          
-    
-    /* Lo que ya tenías: */
     padding: 15px 40px;
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between; /* Esto empuja los elementos a los extremos */
     align-items: center;
-    gap: 20px;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); 
 }
 
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-right {
+    position: relative;
+}
+
+/* =========================================
+   REGLAS RESTAURADAS PARA EL LOGO Y TÍTULO
+   ========================================= */
 .header-logo {
     height: 55px;
     width: auto;
@@ -86,6 +96,40 @@ header h1 {
     color: var(--rtp-green);
 }
 
+/* Estilos para el menú desplegable del login */
+.login-dropdown {
+    position: fixed; /* Lo ancla directamente a la pantalla */
+    top: 75px; /* Lo coloca justo debajo de la cabecera */
+    right: 40px; /* Lo alinea a la derecha con tu botón */
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    width: 250px; /* Más angosto para un estilo refinado */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: none;
+    flex-direction: column;
+    z-index: 1100;
+}
+
+.login-dropdown.show {
+    display: flex;
+}
+
+/* Forzamos el ancho de los inputs para que no se desborden */
+.login-dropdown .input-group {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.login-dropdown .input-group input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+}
+
 footer {
     padding: 15px;
     text-align: center;
@@ -98,6 +142,7 @@ body.light-theme {
     --text-muted: #334155;; 
     --glass-bg: rgba(255, 255, 255, 0.55);
     --glass-border: transparent;
+    background-image: url('../img/fondos/public/RTP-Login.png');
 }
 
 body.light-theme .input-group input {
@@ -120,6 +165,9 @@ body.light-theme .input-group input:focus {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    pointer-events: none;
+    opacity: 0.35;
+    transition: opacity 0.4s ease;
 }
 
 /* El menú tipo cristal */
@@ -133,12 +181,18 @@ body.light-theme .input-group input:focus {
     width: 260px;
     margin-bottom: 15px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    pointer-events: auto;
     
     /* Efecto de aparición */
     opacity: 0;
     transform: translateY(20px) scale(0.95);
     pointer-events: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.a11y-container:hover, 
+.a11y-container:focus-within {
+    opacity: 1;
 }
 
 /* Clase dinámica para mostrar el menú */
@@ -202,9 +256,26 @@ body.light-theme .a11y-action-btn:hover {
     color: white; border: none;
     box-shadow: 0 4px 15px rgba(0, 147, 69, 0.4);
     cursor: pointer; display: flex; justify-content: center; align-items: center;
-    transition: transform 0.3s, background-color 0.3s;
+    
+    /* Efecto de reposo: Botón traslúcido */
+    opacity: 0.35;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    transition: transform 0.3s, background-color 0.3s, opacity 0.4s ease;
+    pointer-events: auto;
 }
-.fab-btn:hover { transform: scale(1.1); background-color: var(--rtp-green-hover); }
+
+/* Vuelve a ser sólido al pasar el mouse (PC), al tocarlo (Móvil) o si el menú está abierto */
+.fab-btn:hover, 
+.fab-btn:active,
+.a11y-menu.show + .fab-btn {
+    opacity: 1;
+}
+
+.fab-btn:hover { 
+    transform: scale(1.1); 
+    background-color: var(--rtp-green-hover); 
+}
 
 @media (max-width: 600px) {
     header {
@@ -221,5 +292,14 @@ body.light-theme .a11y-action-btn:hover {
 
     .header-logo {
         height: 45px;
+    }
+
+    .login-dropdown {
+        right: auto; /* Anula la alineación a la derecha de la PC */
+        left: 50%;
+        transform: translateX(-50%); /* Lo empuja exactamente al centro */
+        width: 90%; /* Ocupa casi toda la pantalla para que sea fácil teclear */
+        max-width: 350px;
+        top: 130px; /* Lo baja un poco para que no tape el logo */
     }
 }

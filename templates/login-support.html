@@ -6,15 +6,37 @@
     <title>Soporte | RTP-Preventivo</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base_public.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/support.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 <body>
 
     <div class="overlay"></div>
 
-    <header class="glass-panel">
-        <img src="{{ url_for('static', filename='logo-rtp.png') }}" alt="Logo Oficial RTP" class="header-logo">
-        <h1>RED DE TRANSPORTE DE PASAJEROS</h1>
+<header class="glass-panel">
+        <a href="/" class="header-left" style="text-decoration: none; cursor: pointer;">
+            <img src="{{ url_for('static', filename='img/logos/logo-rtp.png') }}" alt="Logo Oficial RTP" class="header-logo">
+            <h1>RED DE TRANSPORTE DE PASAJEROS</h1>
+        </a>
+        
+        <div class="header-right">
+            <button id="header-login-btn" class="header-btn">Iniciar Sesión</button>            <!-- Menú Desplegable -->
+
+        </div>
     </header>
+
+            <div id="login-dropdown" class="login-dropdown">
+                <form action="{{ url_for('main.login') }}" method="POST">
+                    <div class="input-group">
+                        <label for="drop-username">Login:</label>
+                        <input type="text" id="drop-username" name="username" required autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <label for="drop-password">Contraseña:</label>
+                        <input type="password" id="drop-password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Entrar</button>
+                </form>
+            </div>
 
     <main>
         <div class="support-card">
@@ -53,5 +75,26 @@
     </main>
     {% include 'components/footer.html' %}
     {% include 'components/fab.html' %}
+
+
+    <script src="{{ url_for('static', filename='js/cache-control.js') }}"></script>
+
+    <script>
+        const headerLoginBtn = document.getElementById('header-login-btn');
+        const loginDropdown = document.getElementById('login-dropdown');
+
+        if (headerLoginBtn && loginDropdown) {
+            headerLoginBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                loginDropdown.classList.toggle('show');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (loginDropdown.classList.contains('show') && !loginDropdown.contains(e.target) && e.target !== headerLoginBtn) {
+                    loginDropdown.classList.remove('show');
+                }
+            });
+        }
+    </script>
 </body>
 </html>

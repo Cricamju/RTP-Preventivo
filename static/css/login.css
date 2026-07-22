@@ -28,12 +28,8 @@ main {
     color: var(--text-light);
 }
 
-.input-group {
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-.input-group label {
+.input-group label, 
+.login-dropdown .input-group label {
     display: block;
     margin-bottom: 8px;
     font-size: 0.9rem;
@@ -41,7 +37,8 @@ main {
     font-weight: 500;
 }
 
-.input-group input {
+.input-group input, 
+.login-dropdown .input-group input {
     width: 100%;
     padding: 12px 15px;
     background: rgba(255, 255, 255, 0.05);
@@ -54,7 +51,8 @@ main {
     transition: border-color 0.3s ease, background 0.3s ease;
 }
 
-.input-group input:focus {
+.input-group input:focus, 
+.login-dropdown .input-group input:focus {
     border-color: var(--rtp-green);
     background: rgba(255, 255, 255, 0.1);
 }
@@ -123,18 +121,57 @@ main {
     transform: translateY(-1px);
 }
 
-    body.light-theme .input-group input {
-    background: rgba(255, 255, 255, 0.6); /* Fondo del input ligeramente blanco */
-    color: #007537; /* Letra verde oscuro RTP para máxima legibilidad */
-    border: 1px solid rgba(0, 147, 69, 0.4); /* Borde verde sutil */
-    font-weight: 600; /* Letra un poco más gruesa */
-    }
+body.light-theme .input-group input,
+body.light-theme .login-dropdown .input-group input {
+    background: rgba(255, 255, 255, 0.6); 
+    color: #007537; 
+    border: 1px solid rgba(0, 147, 69, 0.4); 
+    font-weight: normal; 
+}
 
-    body.light-theme .input-group input:focus {
-        background: rgba(255, 255, 255, 0.95); /* Se vuelve casi sólido al hacer clic */
-        border: 1px solid #009345; /* Borde verde vibrante */
-        box-shadow: 0 0 8px rgba(0, 147, 69, 0.2); /* Pequeño resplandor verde */
-    }
+body.light-theme .input-group input:focus,
+body.light-theme .login-dropdown .input-group input:focus {
+    background: rgba(255, 255, 255, 0.95); 
+    border: 1px solid #009345; 
+    box-shadow: 0 0 8px rgba(0, 147, 69, 0.2); 
+}
+
+/* =========================================
+   BOTÓN DE INICIO DE SESIÓN (CABECERA)
+   ========================================= */
+.header-btn {
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    border-radius: 20px; /* Bordes más redondeados para un look moderno */
+    background: rgba(255, 255, 255, 0.15); /* Fondo cristal suave */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--text-light);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.header-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Adaptación del botón para el Tema Claro */
+body.light-theme .header-btn {
+    background: rgba(0, 147, 69, 0.1); /* Verde RTP muy transparente */
+    border: 1px solid rgba(0, 147, 69, 0.3);
+    color: #007537; /* Texto verde oscuro */
+}
+
+body.light-theme .header-btn:hover {
+    background: rgba(0, 147, 69, 0.2);
+    border-color: rgba(0, 147, 69, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 147, 69, 0.15);
+}
 
 /* =========================================
    MEDIA QUERIES ESPECÍFICAS DEL LOGIN
@@ -153,4 +190,24 @@ main {
     .support-link:first-of-type {
         margin-top: 10px;
     }
+}
+
+/* ✅ Reglas nuevas para compactar el menú desplegable */
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.login-dropdown .input-group {
+    margin-bottom: 12px; 
+}
+
+.login-dropdown .input-group label {
+    margin-bottom: 4px; 
+    font-size: 0.85rem;
+}
+
+.login-dropdown .input-group input {
+    padding: 8px 12px; 
+    font-size: 0.9rem;
 }

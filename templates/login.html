@@ -12,16 +12,16 @@
     <div class="overlay"></div>
 
     <header class="glass-panel">
-        <img src="{{ url_for('static', filename='logo-rtp.png') }}" alt="Logo Oficial RTP" class="header-logo">
-        <h1>RED DE TRANSPORTE DE PASAJEROS</h1>
+        <a href="/" class="header-left" style="text-decoration: none; cursor: pointer;">
+            <img src="{{ url_for('static', filename='img/logos/logo-rtp.png') }}" alt="Logo Oficial RTP" class="header-logo">
+            <h1>RED DE TRANSPORTE DE PASAJEROS</h1>        </a>
     </header>
 
     <main>
         <div class="login-card">
             <h2>Acceder a RTP-Preventivo</h2>
             
-            <form id="login-form">
-                <div class="input-group">
+            <form id="login-form" method="POST">                <div class="input-group">
                     <label for="username">Login:</label>
                     <input type="text" id="username" name="username" required autocomplete="off">
                 </div>
@@ -33,8 +33,7 @@
 
                 <div class="actions-container">
                 <button type="submit" class="btn btn-primary">Entrar</button>
-                <button type="button" id="btn-limpiar" class="btn btn-secondary">Limpiar</button>
-                
+                <button type="reset" id="btn-limpiar" class="btn btn-secondary">Limpiar</button>                
                 <a href="https://rtp.cdmx.gob.mx" target="_blank" class="support-link">Más sobre RTP</a>
                 <a href="{{ url_for('main.login_support') }}" class="support-link">¿Necesitas Ayuda?</a>
             </div>
@@ -42,5 +41,6 @@
     </main>
     {% include 'components/footer.html' %}
     {% include 'components/fab.html' %}
+    <script src="{{ url_for('static', filename='js/cache-control.js') }}"></script>
 </body>
 </html>

@@ -6,37 +6,63 @@
     <title>{% block title %}Intranet{% endblock %} | RTP-Preventivo</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base_private.css') }}">
 </head>
-<!-- Inyectamos la variable 'role' para cambiar el fondo dinámicamente -->
 <body class="theme-{{ role }}">
 
     <div class="overlay"></div>
 
     <header>
-        <button id="menu-btn" class="menu-toggle">☰</button>
-        <img src="{{ url_for('static', filename='logo-rtp.png') }}" alt="Logo Oficial RTP" class="header-logo">
-        <h1>SISTEMA DE MANTENIMIENTO RTP</h1>
+        <a href="/" class="header-left" style="text-decoration: none; cursor: pointer;">
+            <img src="{{ url_for('static', filename='img/logos/logo-rtp.png') }}" alt="Logo Oficial RTP" class="header-logo">
+            <h1>SISTEMA DE MANTENIMIENTO RTP</h1>
+        </a>
+        
+        <div class="header-right">
+            <div class="user-profile-wrapper" id="user-profile-btn">
+                <div class="user-profile">
+                    <!-- Flecha separada en un span -->
+                    👤 <span class="username-text">{{ session.get('username', 'Usuario') }}</span> <span class="dropdown-arrow">▾</span>
+                </div>
+            </div>
+        </div>
     </header>
 
-    <nav id="sidebar" class="sidebar">
+    <!-- Menú desplegable movido afuera para que funcione el efecto cristal (blur) -->
+    <div id="user-dropdown" class="user-dropdown">
+        <a href="{{ url_for('main.logout') }}" class="dropdown-link">
+            🚪 Cerrar Sesión
+        </a>
+    </div>
+
+<nav id="sidebar" class="sidebar">
         <div class="sidebar-nav">
-            <!-- Botón de Inicio dinámico basado en el rol -->
-            <a href="/dashboard/{{ role }}" class="sidebar-link active">Inicio</a>
+            <!-- Compara si la ruta actual es el dashboard de este rol -->
+            <a href="/dashboard/{{ role }}" class="sidebar-link {% if request.path == '/dashboard/' ~ role %}active{% endif %}">
+                <span class="icon">🏠</span> <span class="text">Inicio</span>
+            </a>
             
-            <!-- Módulos operativos: Solo para Admin y Editor -->
             {% if role == 'admin' or role == 'editor' %}
-                <a href="/odometro" class="sidebar-link">Captura de Odómetro</a>
-                <a href="/gsp" class="sidebar-link">Módulo GSP (Preventivo)</a>
-                <a href="/correctivo" class="sidebar-link">Órdenes de Reparación</a>
+                <a href="/odometro" class="sidebar-link {% if request.path == '/odometro' %}active{% endif %}">
+                    <span class="icon">⏱️</span> <span class="text">Captura de Odómetro</span>
+                </a>
+                <a href="/gsp" class="sidebar-link {% if request.path == '/gsp' %}active{% endif %}">
+                    <span class="icon">🛠️</span> <span class="text">Módulo GSP (Preventivo)</span>
+                </a>
+                <a href="/correctivo" class="sidebar-link {% if request.path == '/correctivo' %}active{% endif %}">
+                    <span class="icon">📋</span> <span class="text">Órdenes de Reparación</span>
+                </a>
             {% endif %}
 
-            <!-- Módulo de consultas: Solo para Admin y Consulta -->
             {% if role == 'admin' or role == 'consulta' %}
-                <a href="/reportes" class="sidebar-link">Generar Reportes</a>
+                <a href="/reportes" class="sidebar-link {% if request.path == '/reportes' %}active{% endif %}">
+                    <span class="icon">📊</span> <span class="text">Generar Reportes</span>
+                </a>
             {% endif %}
         </div>
         
         <div class="sidebar-bottom">
-            <a href="{{ url_for('main.login') }}" class="sidebar-link">Cerrar Sesión</a>
+            <a href="/ayuda" class="sidebar-link {% if request.path == '/ayuda' %}active{% endif %}">
+                <span class="icon">❓</span> <span class="text">Ayuda del Sistema</span>
+            </a>
         </div>
     </nav>
 
@@ -47,26 +73,9 @@
     
     {% include 'components/footer.html' %}
     {% include 'components/fab.html' %}
-
-    <script>
-        const menuBtn = document.getElementById('menu-btn');
-        const sidebar = document.getElementById('sidebar');
-
-        if (menuBtn && sidebar) {
-            // Abrir menú al hacer clic en ☰
-            menuBtn.addEventListener('click', (event) => {
-                event.stopPropagation(); // Evita que se cierre instantáneamente
-                sidebar.classList.toggle('open');
-            });
-
-            // Cerrar menú al hacer clic en el área vacía (fuera del menú)
-            document.addEventListener('click', (event) => {
-                if (sidebar.classList.contains('open') && !sidebar.contains(event.target) && event.target !== menuBtn) {
-                    sidebar.classList.remove('open');
-                }
-            });
-        }
-    </script>
     
+    <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/cache-control.js') }}"></script>
+
 </body>
 </html>

@@ -21,7 +21,7 @@ body.light-theme {
 body {
     margin: 0;
     padding: 0;
-    padding-top: 85px; /* Compensa el Header fijo */
+    padding-top: 85px;
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background-image: url('../RTP-Login.png');
     background-size: cover;
@@ -42,49 +42,122 @@ body {
 }
 
 header {
+    /* ... Conserva tus estilos actuales del header ... */
     position: fixed;
     top: 0; left: 0; width: 100%;
     height: 85px;
     background: var(--glass-bg);
     backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: center;
     padding: 0 40px;
-    gap: 20px;
     z-index: 1000;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 }
 
-.menu-toggle {
-    background: transparent;
-    border: none;
-    color: var(--rtp-green);
-    font-size: 1.8rem;
-    cursor: pointer;
+.header-left {
     display: flex;
     align-items: center;
-    transition: transform 0.2s;
+    gap: 20px;
 }
 
-.menu-toggle:hover {
-    transform: scale(1.1);
+/* Estilo para mostrar el nombre del usuario logueado */
+.user-profile {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 147, 69, 0.15);
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 147, 69, 0.3);
+    color: var(--text-light);
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
 }
-
-.header-logo { height: 50px; width: auto; }
-header h1 { margin: 0; font-size: 1.2rem; color: var(--rtp-green); letter-spacing: 2px;}
 
 .header-logo { height: 50px; width: auto; }
 header h1 { margin: 0; font-size: 1.2rem; color: var(--rtp-green); letter-spacing: 2px;}
 
 /* =========================================
-   SIDEBAR (Menú Lateral)
+   NUEVO MENÚ DEL PERFIL
+   ========================================= */
+.user-profile-wrapper {
+    position: relative;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 147, 69, 0.15);
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 147, 69, 0.3);
+    color: var(--text-light);
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.user-profile:hover {
+    background: rgba(0, 147, 69, 0.25);
+    border-color: rgba(0, 147, 69, 0.5);
+}
+
+.dropdown-arrow {
+    margin-left: 10px;
+}
+
+.user-dropdown {
+    position: fixed;
+    top: 75px;
+    right: 40px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 10px;
+    width: 200px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: none;
+    flex-direction: column;
+    z-index: 1100;
+}
+
+.user-dropdown.show { display: flex; }
+
+.dropdown-link {
+    padding: 12px 15px;
+    color: #ef4444; /* Rojo para cerrar sesión */
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.3s;
+}
+
+.dropdown-link:hover { background: rgba(239, 68, 68, 0.15); }
+
+/* Tema Claro para el Dropdown */
+body.light-theme .user-dropdown {
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(0, 147, 69, 0.3);
+}
+
+/* =========================================
+   SIDEBAR TIPO OPERA GX
    ========================================= */
 .sidebar {
     position: fixed;
     top: 85px;
     left: 0;
-    width: 280px; 
+    width: 75px; /* Estado contraído (Solo Iconos) */
     height: calc(100vh - 85px);
     background: var(--glass-bg);
     backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
@@ -92,31 +165,32 @@ header h1 { margin: 0; font-size: 1.2rem; color: var(--rtp-green); letter-spacin
     z-index: 900;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Empuja el nav arriba y el logout abajo */
     padding: 20px 0;
-    
-    /* Animación de entrada/salida */
-    transform: translateX(-100%); 
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden; /* Oculta el texto */
+    white-space: nowrap; /* Evita que el texto caiga de línea */
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    justify-content: space-between;
 }
 
-/* Clase que JS agregará para mostrar el menú */
-.sidebar.open {
-    transform: translateX(0);
+.sidebar:hover {
+    width: 280px; /* Estado expandido al poner el ratón */
+    box-shadow: 10px 0 30px rgba(0,0,0,0.3); /* Sombra flotante */
 }
 
 .sidebar-nav {
     display: flex;
     flex-direction: column;
-    gap: 5px; /* Espaciado uniforme para todos */
+    gap: 5px;
 }
 
 .sidebar-link {
-    padding: 15px 30px;
+    padding: 15px 22px; /* Centra el icono matemáticamente en los 75px */
     color: var(--text-light);
     text-decoration: none;
     font-weight: 500;
     font-size: 0.95rem;
+    display: flex;
+    align-items: center;
     transition: all 0.3s ease;
     border-left: 4px solid transparent;
 }
@@ -132,23 +206,37 @@ header h1 { margin: 0; font-size: 1.2rem; color: var(--rtp-green); letter-spacin
     color: var(--rtp-green);
 }
 
-/* El botón de cerrar sesión especial */
-.sidebar-bottom {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: 10px;
+/* Manejo del Icono y el Texto */
+.sidebar-link .icon {
+    font-size: 1.3rem;
+    min-width: 30px;
+    text-align: center;
 }
-.sidebar-bottom .sidebar-link { color: #ef4444; }
-.sidebar-bottom .sidebar-link:hover { background: rgba(239, 68, 68, 0.15); border-left-color: #ef4444; }
+
+.sidebar-link .text {
+    margin-left: 15px;
+    opacity: 0; /* Texto invisible por defecto */
+    transition: opacity 0.2s ease;
+}
+
+.sidebar:hover .sidebar-link .text {
+    opacity: 1; /* Aparece el texto */
+    transition-delay: 0.1s; /* Con un pequeño retraso elegante */
+}
 
 /* =========================================
    ZONA DE CONTENIDO Y FAB
    ========================================= */
 main.content-area {
-    margin-left: 260px;
+    margin-left: 75px;
     padding: 40px;
-    flex: 1;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1; /* Esto hace que el footer se quede pegado abajo sin crear scroll */
 }
-
 /* =========================================
    MENÚ DE ACCESIBILIDAD Y FAB
    ========================================= */
@@ -160,6 +248,7 @@ main.content-area {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    pointer-events: none;
 }
 
 /* El menú tipo cristal */
@@ -173,6 +262,7 @@ main.content-area {
     width: 260px;
     margin-bottom: 15px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    pointer-events: auto;
     
     /* Efecto de aparición */
     opacity: 0;
@@ -242,9 +332,26 @@ body.light-theme .a11y-action-btn:hover {
     color: white; border: none;
     box-shadow: 0 4px 15px rgba(0, 147, 69, 0.4);
     cursor: pointer; display: flex; justify-content: center; align-items: center;
-    transition: transform 0.3s, background-color 0.3s;
+    
+    /* Efecto de reposo: Botón traslúcido */
+    opacity: 0.35;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    transition: transform 0.3s, background-color 0.3s, opacity 0.4s ease;
+    pointer-events: auto;
 }
-.fab-btn:hover { transform: scale(1.1); background-color: var(--rtp-green-hover); }
+
+/* Vuelve a ser sólido al pasar el mouse (PC), al tocarlo (Móvil) o si el menú está abierto */
+.fab-btn:hover, 
+.fab-btn:active,
+.a11y-menu.show + .fab-btn {
+    opacity: 1;
+}
+
+.fab-btn:hover { 
+    transform: scale(1.1); 
+    background-color: var(--rtp-green-hover); 
+}
 
 /* =========================================
    ZONA DE CONTENIDO DINÁMICO
@@ -268,19 +375,18 @@ footer.glass-panel {
 }
 
 /* =========================================
-   FONDOS DE PANTALLA POR ROL
+   FONDOS POR ROL (MODO OSCURO - DEFAULT)
    ========================================= */
-body.theme-admin {
-    background-image: url('../RTP-Admin.png');
-}
+body.theme-admin { background-image: url('../img/fondos/admin/RTP-Admin-Dark.png'); }
+body.theme-editor { background-image: url('../img/fondos/editor/RTP-Editor-Dark.png'); }
+body.theme-consulta { background-image: url('../img/fondos/consulta/RTP-Consulta-Dark.png'); }
 
-body.theme-editor {
-    background-image: url('../RTP-Editor.png');
-}
-
-body.theme-consulta {
-    background-image: url('../RTP-Consulta.png');
-}
+/* =========================================
+   FONDOS POR ROL (MODO CLARO)
+   ========================================= */
+body.light-theme.theme-admin { background-image: url('../img/fondos/admin/RTP-Admin.png'); }
+body.light-theme.theme-editor { background-image: url('../img/fondos/editor/RTP-Editor.png'); }
+body.light-theme.theme-consulta { background-image: url('../img/fondos/consulta/RTP-Consulta.png'); }
 
 /* Tarjeta de bienvenida para los dashboards */
 .welcome-card {
@@ -293,6 +399,7 @@ body.theme-consulta {
     max-width: 800px;
     margin: 0 auto;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 100%;
 }
 
 .welcome-card h2 {
@@ -300,4 +407,121 @@ body.theme-consulta {
     margin-top: 0;
     border-bottom: 2px solid rgba(255, 255, 255, 0.1);
     padding-bottom: 15px;
+}
+
+/* =========================================
+   📱 VISTA MÓVIL (Android / iOS) - ESTILO PÍLDORA TELEGRAM
+   ========================================= */
+@media (max-width: 768px) {
+    
+    /* 1. Header más compacto */
+    header {
+        padding: 10px 20px;
+        height: 70px;
+    }
+    header h1 {
+        display: none; /* Ocultamos el texto largo, dejamos solo el logo y el perfil */
+    }
+    
+    /* 2. Área principal hace espacio para la píldora inferior */
+    main.content-area {
+        margin-left: 0; /* Quitamos el margen del menú lateral */
+        padding: 20px;
+        padding-bottom: 110px; 
+        min-height: calc(100vh - 70px);
+    }
+
+    /* 3. Transformación del Menú a Píldora Flotante */
+    .sidebar {
+        top: auto;
+        bottom: 20px; 
+        left: 50%;
+        transform: translateX(-50%); 
+        width: 92%; 
+        height: 65px;
+        border-radius: 35px; 
+        flex-direction: row;
+        justify-content: space-evenly;
+        padding: 0;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), bottom 0.4s ease !important;        }
+
+    .sidebar:hover,
+    .sidebar:active,
+    .sidebar:focus-within {
+        width: 92% !important;
+    }
+
+    .sidebar.sidebar-hidden {
+            transform: translate(-50%, 150%);
+            bottom: -100px;
+        }
+    
+    .sidebar.sidebar-at-bottom {
+        bottom: 75px; /* Sube la píldora por encima del footer */
+    }
+
+    /* 4. Acomodo de los contenedores internos del menú */
+    .sidebar-nav {
+        flex-direction: row;
+        justify-content: space-evenly; /* Distribuye el espacio sobrante por igual */
+        align-items: center;
+        width: 100%;
+        gap: 0;
+        display: contents;
+    }
+    
+    .sidebar-bottom {
+        display: flex;
+        align-items: center;
+        margin-right: 5px; /* Un pequeño margen para el último botón */
+        display: contents;
+    }
+
+    /* 5. Estilo de los Iconos (Botones de la píldora) */
+   .sidebar-link {
+        flex: 1; /* Obliga a todos los botones a medir exactamente lo mismo */
+        padding: 10px 0; /* Padding vertical, horizontal en 0 para centrar exacto */
+        border-left: none; 
+        flex-direction: column; 
+        align-items: center; /* Centra el contenido */
+        justify-content: center;
+        border-radius: 0; 
+        height: 100%;
+    }
+
+    .sidebar-link .text {
+        display: none; 
+    }
+
+    .sidebar-link .icon {
+        margin-left: 0; /* Quitamos el margen izquierdo que lo desalineaba */
+        font-size: 1.4rem;
+    }
+
+    .sidebar-link.active {
+        border-left: none;
+        background: rgba(0, 147, 69, 0.2); /* Sombreado cristalino */
+        color: var(--rtp-green);
+        box-shadow: none; /* Quitamos la sombra sólida */
+    }
+
+    .sidebar-link.active .icon {
+    color: var(--rtp-green);
+    }
+
+    /* 6. Acomodo del Menú de Accesibilidad y Menú de Usuario */
+    .a11y-container {
+        bottom: 100px; /* Lo subimos bastante más para que no toque la barra */
+        right: 15px; /* Lo pegamos un poco más al borde */
+        transform: scale(0.85); /* Un poco más pequeño para celulares */
+    }
+
+    .user-dropdown {
+        top: 65px;
+        right: 20px;
+        width: 180px;
+    }
 }

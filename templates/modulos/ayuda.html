@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Ayuda del Sistema{% endblock %}
+
+{% block content %}
+<div class="welcome-card">
+    <h2>❓ Ayuda y Soporte</h2>
+    <p>Manual de usuario del Sistema de Mantenimiento RTP.</p>
+    
+    <div style="margin-top: 25px; text-align: left;">
+        <h4 style="color: var(--rtp-green);">Acerca de los módulos:</h4>
+        <ul style="color: var(--text-muted); line-height: 1.6;">
+            <li><strong>Captura de Odómetro:</strong> Ingreso diario del kilometraje de las unidades.</li>
+            <li><strong>Módulo GSP:</strong> Programación y seguimiento de mantenimientos preventivos.</li>
+            <li><strong>Órdenes de Reparación:</strong> Alta y seguimiento de fallas imprevistas.</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
