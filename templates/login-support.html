@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Soporte | RTP-Preventivo</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/logos/logo_oficial.png') }}" type="image/png">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base_public.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/support.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
@@ -12,31 +13,31 @@
 
     <div class="overlay"></div>
 
-<header class="glass-panel">
+    <header class="glass-panel">
         <a href="/" class="header-left" style="text-decoration: none; cursor: pointer;">
             <img src="{{ url_for('static', filename='img/logos/logo-rtp.png') }}" alt="Logo Oficial RTP" class="header-logo">
             <h1>RED DE TRANSPORTE DE PASAJEROS</h1>
         </a>
         
         <div class="header-right">
-            <button id="header-login-btn" class="header-btn">Iniciar Sesión</button>            <!-- Menú Desplegable -->
-
+            <button id="header-login-btn" class="header-btn">Iniciar Sesión</button>
         </div>
     </header>
 
-            <div id="login-dropdown" class="login-dropdown">
-                <form action="{{ url_for('main.login') }}" method="POST">
-                    <div class="input-group">
-                        <label for="drop-username">Login:</label>
-                        <input type="text" id="drop-username" name="username" required autocomplete="off">
-                    </div>
-                    <div class="input-group">
-                        <label for="drop-password">Contraseña:</label>
-                        <input type="password" id="drop-password" name="password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Entrar</button>
-                </form>
+    <!-- Menú Desplegable del Login -->
+    <div id="login-dropdown" class="login-dropdown">
+        <form action="{{ url_for('main.login') }}" method="POST">
+            <div class="input-group">
+                <label for="drop-username">Login:</label>
+                <input type="text" id="drop-username" name="username" required autocomplete="off">
             </div>
+            <div class="input-group">
+                <label for="drop-password">Contraseña:</label>
+                <input type="password" id="drop-password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Entrar</button>
+        </form>
+    </div>
 
     <main>
         <div class="support-card">
@@ -71,30 +72,39 @@
                 </div>
             </details>
 
-            <a href="{{ url_for('main.login') }}" class="back-btn">← Regresar al inicio de sesión</a>        </div>
+            <a href="{{ url_for('main.login') }}" class="back-btn">← Regresar al inicio de sesión</a>
+        </div>
     </main>
+
     {% include 'components/footer.html' %}
     {% include 'components/fab.html' %}
-
 
     <script src="{{ url_for('static', filename='js/cache-control.js') }}"></script>
 
     <script>
-        const headerLoginBtn = document.getElementById('header-login-btn');
-        const loginDropdown = document.getElementById('login-dropdown');
+        document.addEventListener('DOMContentLoaded', () => {
+            // ==========================================
+            // Lógica del menú desplegable superior
+            // ==========================================
+            const headerLoginBtn = document.getElementById('header-login-btn');
+            const loginDropdown = document.getElementById('login-dropdown');
 
-        if (headerLoginBtn && loginDropdown) {
-            headerLoginBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                loginDropdown.classList.toggle('show');
-            });
+            if (headerLoginBtn && loginDropdown) {
+                headerLoginBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    loginDropdown.classList.toggle('show');
+                });
 
-            document.addEventListener('click', (e) => {
-                if (loginDropdown.classList.contains('show') && !loginDropdown.contains(e.target) && e.target !== headerLoginBtn) {
-                    loginDropdown.classList.remove('show');
-                }
-            });
-        }
+                document.addEventListener('click', (e) => {
+                    if (loginDropdown.classList.contains('show') && !loginDropdown.contains(e.target) && e.target !== headerLoginBtn) {
+                        loginDropdown.classList.remove('show');
+                    }
+                });
+            }
+            
+            // ¡Se eliminó todo el JS conflictivo de las FAQ! 
+            // Ahora CSS hace la magia limpia.
+        });
     </script>
 </body>
 </html>

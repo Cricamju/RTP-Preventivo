@@ -33,6 +33,12 @@ def login():
             session['rol'] = user.rol # Guardamos la sesión
             session['username'] = user.username
             
+            # ✅ AGREGADO: Alerta de bienvenida exitosa
+            flash(f'¡Bienvenido, @{user.username}!', 'success')
+            
+            # ✅ NUEVA ALERTA: Tip de accesibilidad enviado desde el servidor
+            flash('Tip: Explora el menú flotante inferior derecho para cambiar temas y letras.', 'info')
+            
             if user.rol == 'Admin':
                 return redirect(url_for('main.dashboard_admin'))
             elif user.rol == 'Editor':
@@ -40,7 +46,9 @@ def login():
             elif user.rol == 'Consulta':
                 return redirect(url_for('main.dashboard_consulta'))
         else:
-            flash('Usuario o contraseña incorrectos', 'error')
+            # ✅ CORREGIDO: Alerta de error y redirección limpia
+            flash('Error en usuario o contraseña', 'error')
+            return redirect(url_for('main.login'))
 
     return render_template('login.html')
 
@@ -54,6 +62,19 @@ def login_support():
         elif session['rol'] == 'Consulta':
             return redirect(url_for('main.dashboard_consulta'))
     return render_template('login-support.html')
+
+import os
+from flask import send_from_directory
+
+# ... (tus rutas de login) ...
+
+@main_bp.route('/favicon.ico')
+def favicon():
+    # Esto fuerza a los navegadores a encontrar el logo aunque ignoren el HTML
+    return send_from_directory(
+        os.path.join(main_bp.root_path, '../static/img/logos'),
+        'main_logo.png', mimetype='image/png'
+    )
 
 # ==========================================
 # RUTAS PRIVADAS (Protegidas por Sesión)
@@ -154,4 +175,7 @@ def guardar_odometro():
 def logout():
     # Limpiamos todos los datos de la sesión actual
     session.clear()
+    
+    # ✅ AGREGADO: Alerta de cierre de sesión exitoso
+    flash('Cerró sesión con éxito', 'success')
     return redirect(url_for('main.login'))

@@ -1,9 +1,12 @@
+
+
 <!DOCTYPE html>
 <html lang="es-MX">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Intranet{% endblock %} | RTP-Preventivo</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/logos/main_logo.png') }}" type="image/png">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base_private.css') }}">
 </head>
 <body class="theme-{{ role }}">
@@ -20,8 +23,8 @@
             <div class="user-profile-wrapper" id="user-profile-btn">
                 <div class="user-profile">
                     <!-- Flecha separada en un span -->
-                    👤 <span class="username-text">{{ session.get('username', 'Usuario') }}</span> <span class="dropdown-arrow">▾</span>
-                </div>
+                <!-- Reemplaza esta línea dentro de .user-profile -->
+                👤 <span style="margin-left: 8px;" class="username-text">{{ session.get('username', 'Usuario') }}</span> <span class="dropdown-arrow">▾</span>                </div>
             </div>
         </div>
     </header>
@@ -73,9 +76,9 @@
     
     {% include 'components/footer.html' %}
     {% include 'components/fab.html' %}
-    
+    {% include 'components/toast.html' %}
     <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/cache-control.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/cache-control.js') }}"></script>    
 
 </body>
 </html>

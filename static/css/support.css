@@ -16,7 +16,7 @@ main {
     border-radius: 16px;
     padding: 40px;
     width: 100%;
-    max-width: 600px; /* Más ancho que el login para que quepa bien el texto */
+    max-width: 600px;
     box-sizing: border-box;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
@@ -35,13 +35,16 @@ main {
     line-height: 1.5;
 }
 
-/* Estilos del Acordeón Nativo (FAQ) */
+/* =========================================
+   ESTILOS Y ANIMACIÓN DEL ACORDEÓN (CSS PURO)
+   ========================================= */
 details {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     margin-bottom: 15px;
     transition: background 0.3s ease;
+    overflow: hidden;
 }
 
 details:hover {
@@ -52,11 +55,15 @@ summary {
     padding: 15px 20px;
     font-weight: 600;
     cursor: pointer;
-    list-style: none; /* Oculta la flecha por defecto en algunos navegadores */
+    list-style: none;
     display: flex;
     justify-content: space-between;
     align-items: center;
     color: var(--text-light);
+}
+
+summary::-webkit-details-marker {
+    display: none;
 }
 
 /* Flecha personalizada */
@@ -71,11 +78,17 @@ details[open] summary::after {
     transform: rotate(180deg);
 }
 
+/* El contenido inicia oculto */
 .faq-content {
-    padding: 0 20px 20px 20px;
+    padding: 0 20px;
     color: var(--text-muted);
     font-size: 0.9rem;
     line-height: 1.6;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    /* La transición se aplica aquí */
+    transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
 }
 
 .faq-content a {
@@ -85,6 +98,13 @@ details[open] summary::after {
 
 .faq-content a:hover {
     text-decoration: underline;
+}
+
+/* 🟢 LA SOLUCIÓN: Cuando el details está abierto nativamente, CSS anima el contenido */
+details[open] .faq-content {
+    max-height: 500px;
+    opacity: 1;
+    padding-bottom: 20px;
 }
 
 /* Botón de regreso */

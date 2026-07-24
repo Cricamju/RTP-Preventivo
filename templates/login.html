@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | RTP-Preventivo</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/logos/main_logo.png') }}" type="image/png">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base_public.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
@@ -14,14 +15,16 @@
     <header class="glass-panel">
         <a href="/" class="header-left" style="text-decoration: none; cursor: pointer;">
             <img src="{{ url_for('static', filename='img/logos/logo-rtp.png') }}" alt="Logo Oficial RTP" class="header-logo">
-            <h1>RED DE TRANSPORTE DE PASAJEROS</h1>        </a>
+            <h1>RED DE TRANSPORTE DE PASAJEROS</h1>        
+        </a>
     </header>
 
     <main>
         <div class="login-card">
             <h2>Acceder a RTP-Preventivo</h2>
             
-            <form id="login-form" method="POST">                <div class="input-group">
+            <form id="login-form" method="POST">                
+                <div class="input-group">
                     <label for="username">Login:</label>
                     <input type="text" id="username" name="username" required autocomplete="off">
                 </div>
@@ -32,15 +35,39 @@
                 </div>
 
                 <div class="actions-container">
-                <button type="submit" class="btn btn-primary">Entrar</button>
-                <button type="reset" id="btn-limpiar" class="btn btn-secondary">Limpiar</button>                
-                <a href="https://rtp.cdmx.gob.mx" target="_blank" class="support-link">Más sobre RTP</a>
-                <a href="{{ url_for('main.login_support') }}" class="support-link">¿Necesitas Ayuda?</a>
-            </div>
-            </div>
+                    <button type="submit" class="btn btn-primary">Entrar</button>
+                    <button type="reset" id="btn-limpiar" class="btn btn-secondary">Limpiar</button>                
+                    <a href="https://rtp.cdmx.gob.mx" target="_blank" class="support-link">Más sobre RTP</a>
+                    <a href="{{ url_for('main.login_support') }}" class="support-link">¿Necesitas Ayuda?</a>
+                </div>
+            </form> <!-- ¡Etiqueta de cierre corregida! -->
+        </div>
     </main>
+    
     {% include 'components/footer.html' %}
     {% include 'components/fab.html' %}
+    
+    <!-- 1. Incluimos el componente de notificaciones (ya trae el JS integrado) -->
+    {% include 'components/toast.html' %}
+    
     <script src="{{ url_for('static', filename='js/cache-control.js') }}"></script>
+
+    <!-- 2. Script específico para la pantalla de Login -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Alerta de bienvenida para Accesibilidad (Saldrá siempre)
+            setTimeout(() => {
+                showToast('Tip: Explora el menú flotante inferior derecho para cambiar temas y letras.', 'info', 6000);
+            }, 800);
+
+            // Alerta al limpiar los campos
+            const btnLimpiar = document.getElementById('btn-limpiar');
+            if (btnLimpiar) {
+                btnLimpiar.addEventListener('click', () => {
+                    showToast('Campos limpiados', 'info', 3000);
+                });
+            }
+        });
+    </script>
 </body>
 </html>
