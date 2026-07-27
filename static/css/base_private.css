@@ -1,4 +1,6 @@
 /* static/css/base_private.css */
+@import url('accessibility.css');
+
 :root {
     --rtp-green: #009345; 
     --rtp-green-hover: #007537;
@@ -6,13 +8,6 @@
     --text-muted: #cbd5e1;
     --glass-bg: rgba(20, 25, 20, 0.65);
     --glass-border: transparent; 
-}
-
-/* Tema Claro Dinámico */
-body.light-theme {
-    --text-light: #007537; 
-    --text-muted: #334155; 
-    --glass-bg: rgba(255, 255, 255, 0.55); 
 }
 
 /* Reset y Body */
@@ -42,7 +37,6 @@ body {
 }
 
 header {
-    /* ... Conserva tus estilos actuales del header ... */
     position: fixed;
     top: 0; left: 0; width: 100%;
     height: 85px;
@@ -60,20 +54,6 @@ header {
     display: flex;
     align-items: center;
     gap: 20px;
-}
-
-/* Estilo para mostrar el nombre del usuario logueado */
-.user-profile {
-    display: flex;
-    align-items: center;
-    background: rgba(0, 147, 69, 0.15);
-    padding: 8px 16px;
-    border-radius: 20px;
-    border: 1px solid rgba(0, 147, 69, 0.3);
-    color: var(--text-light);
-    font-weight: 600;
-    font-size: 0.9rem;
-    letter-spacing: 0.5px;
 }
 
 .header-logo { height: 50px; width: auto; }
@@ -131,7 +111,7 @@ header h1 { margin: 0; font-size: 1.2rem; color: var(--rtp-green); letter-spacin
 
 .dropdown-link {
     padding: 12px 15px;
-    color: #ef4444; /* Rojo para cerrar sesión */
+    color: #ef4444;
     text-decoration: none;
     font-weight: 600;
     font-size: 0.95rem;
@@ -140,11 +120,11 @@ header h1 { margin: 0; font-size: 1.2rem; color: var(--rtp-green); letter-spacin
     align-items: center;
     gap: 10px;
     transition: background 0.3s;
+    white-space: nowrap;
 }
 
 .dropdown-link:hover { background: rgba(239, 68, 68, 0.15); }
 
-/* Tema Claro para el Dropdown */
 body.light-theme .user-dropdown {
     background: rgba(255, 255, 255, 0.65);
     border: 1px solid rgba(0, 147, 69, 0.3);
@@ -157,7 +137,7 @@ body.light-theme .user-dropdown {
     position: fixed;
     top: 85px;
     left: 0;
-    width: 75px; /* Estado contraído (Solo Iconos) */
+    width: 75px;
     height: calc(100vh - 85px);
     background: var(--glass-bg);
     backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
@@ -166,15 +146,15 @@ body.light-theme .user-dropdown {
     display: flex;
     flex-direction: column;
     padding: 20px 0;
-    overflow: hidden; /* Oculta el texto */
-    white-space: nowrap; /* Evita que el texto caiga de línea */
+    overflow: hidden;
+    white-space: nowrap;
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     justify-content: space-between;
 }
 
 .sidebar:hover {
-    width: 280px; /* Estado expandido al poner el ratón */
-    box-shadow: 10px 0 30px rgba(0,0,0,0.3); /* Sombra flotante */
+    width: 18rem;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.3);
 }
 
 .sidebar-nav {
@@ -184,7 +164,7 @@ body.light-theme .user-dropdown {
 }
 
 .sidebar-link {
-    padding: 15px 22px; /* Centra el icono matemáticamente en los 75px */
+    padding: 15px 22px;
     color: var(--text-light);
     text-decoration: none;
     font-weight: 500;
@@ -206,7 +186,6 @@ body.light-theme .user-dropdown {
     color: var(--rtp-green);
 }
 
-/* Manejo del Icono y el Texto */
 .sidebar-link .icon {
     font-size: 1.3rem;
     min-width: 30px;
@@ -215,18 +194,15 @@ body.light-theme .user-dropdown {
 
 .sidebar-link .text {
     margin-left: 15px;
-    opacity: 0; /* Texto invisible por defecto */
+    opacity: 0;
     transition: opacity 0.2s ease;
 }
 
 .sidebar:hover .sidebar-link .text {
-    opacity: 1; /* Aparece el texto */
-    transition-delay: 0.1s; /* Con un pequeño retraso elegante */
+    opacity: 1;
+    transition-delay: 0.1s;
 }
 
-/* =========================================
-   ZONA DE CONTENIDO Y FAB
-   ========================================= */
 main.content-area {
     margin-left: 75px;
     padding: 40px;
@@ -235,131 +211,9 @@ main.content-area {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    flex: 1; /* Esto hace que el footer se quede pegado abajo sin crear scroll */
-}
-/* =========================================
-   MENÚ DE ACCESIBILIDAD Y FAB
-   ========================================= */
-.a11y-container {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    z-index: 2000;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    pointer-events: none;
+    flex: 1;
 }
 
-/* El menú tipo cristal */
-.a11y-menu {
-    background: var(--glass-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 20px;
-    width: 260px;
-    margin-bottom: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    pointer-events: auto;
-    
-    /* Efecto de aparición */
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-    pointer-events: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Clase dinámica para mostrar el menú */
-.a11y-menu.show {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    pointer-events: auto;
-}
-
-.a11y-menu h4 {
-    margin: 0 0 15px 0;
-    color: var(--rtp-green);
-    text-align: center;
-    font-size: 1.1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 10px;
-}
-
-.a11y-option {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    font-size: 0.9rem;
-    color: var(--text-light);
-}
-
-.btn-group {
-    display: flex;
-    gap: 5px;
-}
-
-.a11y-action-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--text-light);
-    border-radius: 6px;
-    padding: 6px 12px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s, transform 0.1s;
-}
-
-.a11y-action-btn:active { transform: scale(0.95); }
-.a11y-action-btn:hover { background: rgba(255, 255, 255, 0.25); }
-
-/* Adaptación de botones del menú para el Modo Claro */
-body.light-theme .a11y-action-btn {
-    background: rgba(0, 147, 69, 0.1);
-    border: 1px solid rgba(0, 147, 69, 0.3);
-}
-body.light-theme .a11y-action-btn:hover {
-    background: rgba(0, 147, 69, 0.2);
-}
-
-/* El botón flotante principal */
-.fab-btn {
-    width: 60px; height: 60px;
-    border-radius: 50%;
-    background-color: var(--rtp-green);
-    color: white; border: none;
-    box-shadow: 0 4px 15px rgba(0, 147, 69, 0.4);
-    cursor: pointer; display: flex; justify-content: center; align-items: center;
-    
-    /* Efecto de reposo: Botón traslúcido */
-    opacity: 0.35;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    transition: transform 0.3s, background-color 0.3s, opacity 0.4s ease;
-    pointer-events: auto;
-}
-
-/* Vuelve a ser sólido al pasar el mouse (PC), al tocarlo (Móvil) o si el menú está abierto */
-.fab-btn:hover, 
-.fab-btn:active,
-.a11y-menu.show + .fab-btn {
-    opacity: 1;
-}
-
-.fab-btn:hover { 
-    transform: scale(1.1); 
-    background-color: var(--rtp-green-hover); 
-}
-
-/* =========================================
-   ZONA DE CONTENIDO DINÁMICO
-   ========================================= */
-
-/* =========================================
-   FOOTER (Plantilla Maestra)
-   ========================================= */
 footer.glass-panel {
     padding: 15px;
     text-align: center;
@@ -370,25 +224,18 @@ footer.glass-panel {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-top: 1px solid var(--glass-border);
-    margin-top: auto; /* Empuja el footer hasta abajo */
+    margin-top: auto;
     z-index: 10;
 }
 
-/* =========================================
-   FONDOS POR ROL (MODO OSCURO - DEFAULT)
-   ========================================= */
 body.theme-admin { background-image: url('../img/fondos/admin/RTP-Admin-Dark.png'); }
 body.theme-editor { background-image: url('../img/fondos/editor/RTP-Editor-Dark.png'); }
 body.theme-consulta { background-image: url('../img/fondos/consulta/RTP-Consulta-Dark.png'); }
 
-/* =========================================
-   FONDOS POR ROL (MODO CLARO)
-   ========================================= */
 body.light-theme.theme-admin { background-image: url('../img/fondos/admin/RTP-Admin.png'); }
 body.light-theme.theme-editor { background-image: url('../img/fondos/editor/RTP-Editor.png'); }
 body.light-theme.theme-consulta { background-image: url('../img/fondos/consulta/RTP-Consulta.png'); }
 
-/* Tarjeta de bienvenida para los dashboards */
 .welcome-card {
     background: var(--glass-bg);
     backdrop-filter: blur(12px);
@@ -409,29 +256,22 @@ body.light-theme.theme-consulta { background-image: url('../img/fondos/consulta/
     padding-bottom: 15px;
 }
 
-/* =========================================
-   📱 VISTA MÓVIL (Android / iOS) - ESTILO PÍLDORA TELEGRAM
-   ========================================= */
 @media (max-width: 768px) {
-    
-    /* 1. Header más compacto */
     header {
         padding: 10px 20px;
         height: 70px;
     }
     header h1 {
-        display: none; /* Ocultamos el texto largo, dejamos solo el logo y el perfil */
+        display: none;
     }
     
-    /* 2. Área principal hace espacio para la píldora inferior */
     main.content-area {
-        margin-left: 0; /* Quitamos el margen del menú lateral */
+        margin-left: 0;
         padding: 20px;
         padding-bottom: 110px; 
         min-height: calc(100vh - 70px);
     }
 
-    /* 3. Transformación del Menú a Píldora Flotante */
     .sidebar {
         top: auto;
         bottom: 20px; 
@@ -446,7 +286,8 @@ body.light-theme.theme-consulta { background-image: url('../img/fondos/consulta/
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.2);
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), bottom 0.4s ease !important;        }
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), bottom 0.4s ease !important;
+    }
 
     .sidebar:hover,
     .sidebar:active,
@@ -455,18 +296,17 @@ body.light-theme.theme-consulta { background-image: url('../img/fondos/consulta/
     }
 
     .sidebar.sidebar-hidden {
-            transform: translate(-50%, 150%);
-            bottom: -100px;
-        }
+        transform: translate(-50%, 150%);
+        bottom: -100px;
+    }
     
     .sidebar.sidebar-at-bottom {
-        bottom: 75px; /* Sube la píldora por encima del footer */
+        bottom: 75px;
     }
 
-    /* 4. Acomodo de los contenedores internos del menú */
     .sidebar-nav {
         flex-direction: row;
-        justify-content: space-evenly; /* Distribuye el espacio sobrante por igual */
+        justify-content: space-evenly;
         align-items: center;
         width: 100%;
         gap: 0;
@@ -476,17 +316,16 @@ body.light-theme.theme-consulta { background-image: url('../img/fondos/consulta/
     .sidebar-bottom {
         display: flex;
         align-items: center;
-        margin-right: 5px; /* Un pequeño margen para el último botón */
+        margin-right: 5px;
         display: contents;
     }
 
-    /* 5. Estilo de los Iconos (Botones de la píldora) */
-   .sidebar-link {
-        flex: 1; /* Obliga a todos los botones a medir exactamente lo mismo */
-        padding: 10px 0; /* Padding vertical, horizontal en 0 para centrar exacto */
+    .sidebar-link {
+        flex: 1;
+        padding: 10px 0;
         border-left: none; 
         flex-direction: column; 
-        align-items: center; /* Centra el contenido */
+        align-items: center;
         justify-content: center;
         border-radius: 0; 
         height: 100%;
@@ -497,26 +336,25 @@ body.light-theme.theme-consulta { background-image: url('../img/fondos/consulta/
     }
 
     .sidebar-link .icon {
-        margin-left: 0; /* Quitamos el margen izquierdo que lo desalineaba */
+        margin-left: 0;
         font-size: 1.4rem;
     }
 
     .sidebar-link.active {
         border-left: none;
-        background: rgba(0, 147, 69, 0.2); /* Sombreado cristalino */
+        background: rgba(0, 147, 69, 0.2);
         color: var(--rtp-green);
-        box-shadow: none; /* Quitamos la sombra sólida */
+        box-shadow: none;
     }
 
     .sidebar-link.active .icon {
-    color: var(--rtp-green);
+        color: var(--rtp-green);
     }
 
-    /* 6. Acomodo del Menú de Accesibilidad y Menú de Usuario */
     .a11y-container {
-        bottom: 100px; /* Lo subimos bastante más para que no toque la barra */
-        right: 15px; /* Lo pegamos un poco más al borde */
-        transform: scale(0.85); /* Un poco más pequeño para celulares */
+        bottom: 100px;
+        right: 15px;
+        transform: scale(0.85);
     }
 
     .user-dropdown {
