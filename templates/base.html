@@ -38,32 +38,32 @@
 
 <nav id="sidebar" class="sidebar">
         <div class="sidebar-nav">
-            <!-- Compara si la ruta actual es el dashboard de este rol -->
-            <a href="/dashboard/{{ role }}" class="sidebar-link {% if request.path == '/dashboard/' ~ role %}active{% endif %}">
+            <!-- Redirección dinámica al inicio según el rol -->
+            <a href="{{ url_for('main.dashboard_' ~ role) }}" class="sidebar-link {% if 'dashboard' in request.path %}active{% endif %}">
                 <span class="icon">🏠</span> <span class="text">Inicio</span>
             </a>
             
             {% if role == 'admin' or role == 'editor' %}
-                <a href="/odometro" class="sidebar-link {% if request.path == '/odometro' %}active{% endif %}">
+                <a href="{{ url_for('main.odometro') }}" class="sidebar-link {% if 'odometro' in request.path %}active{% endif %}">
                     <span class="icon">⏱️</span> <span class="text">Captura de Odómetro</span>
                 </a>
-                <a href="/gsp" class="sidebar-link {% if request.path == '/gsp' %}active{% endif %}">
+                <a href="{{ url_for('main.gsp') }}" class="sidebar-link {% if 'gsp' in request.path %}active{% endif %}">
                     <span class="icon">🛠️</span> <span class="text">Módulo GSP (Preventivo)</span>
                 </a>
-                <a href="/correctivo" class="sidebar-link {% if request.path == '/correctivo' %}active{% endif %}">
+                <a href="{{ url_for('main.correctivo') }}" class="sidebar-link {% if 'correctivo' in request.path %}active{% endif %}">
                     <span class="icon">📋</span> <span class="text">Órdenes de Reparación</span>
                 </a>
             {% endif %}
 
             {% if role == 'admin' or role == 'consulta' %}
-                <a href="/reportes" class="sidebar-link {% if request.path == '/reportes' %}active{% endif %}">
+                <a href="{{ url_for('main.reportes') }}" class="sidebar-link {% if 'reportes' in request.path %}active{% endif %}">
                     <span class="icon">📊</span> <span class="text">Generar Reportes</span>
                 </a>
             {% endif %}
         </div>
         
         <div class="sidebar-bottom">
-            <a href="/ayuda" class="sidebar-link {% if request.path == '/ayuda' %}active{% endif %}">
+            <a href="{{ url_for('main.ayuda') }}" class="sidebar-link {% if 'ayuda' in request.path %}active{% endif %}">
                 <span class="icon">❓</span> <span class="text">Ayuda del Sistema</span>
             </a>
         </div>

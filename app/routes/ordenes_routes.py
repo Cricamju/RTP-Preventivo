@@ -11,23 +11,26 @@ from app.models import (
 
 ordenes_bp = Blueprint('ordenes', __name__)
 
+# ==========================================
+# 1. CREAR ORDEN (TRANSACCIÓN ATÓMICA)
+# ==========================================
 @ordenes_bp.route('/', methods=['POST'])
 def crear_orden():
     data = request.get_json() or {}
 
-    # Validaciones mínimas de entrada
+    # Validaciones mínimas requeridas
     if not data.get('no_orden_oficial') or not data.get('id_autobus'):
         return jsonify({
             "error": "Datos incompletos",
-            "mensaje": "Se requiere 'no_orden_oficial' e 'id_autobus'"
+            "mensaje": "Se requieren los campos 'no_orden_oficial' e 'id_autobus'."
         }), 400
 
     try:
         # -----------------------------------------------------------
         # INICIO DE TRANSACCIÓN ATÓMICA
         # -----------------------------------------------------------
-        
-        # 1. Insertar la Orden de Mantenimiento (pvo_ordenes_mantenimiento)
+
+        # Paso A: Insertar la Orden de Mantenimiento
         nueva_orden = PvoOrdenMantenimiento(
             no_orden_oficial=data.get('no_orden_oficial'),
             id_autobus=data.get('id_autobus'),
@@ -41,10 +44,10 @@ def crear_orden():
         )
         db.session.add(nueva_orden)
         
-        # Hacemos flush para obtener el 'id_orden' generado por PostgreSQL sin hacer commit aún
+        # Flush para obtener el 'id_orden' autogenerado sin hacer commit aún
         db.session.flush()
 
-        # 2. Insertar Historial de Odómetro (op_historial_kilometraje)
+        # Paso B: Insertar Historial de Odómetro/Kilometraje (si se especificó km_en_ingreso)
         if data.get('km_en_ingreso'):
             nuevo_historial = OpHistorialKilometraje(
                 id_autobus=data.get('id_autobus'),
@@ -55,7 +58,7 @@ def crear_orden():
             )
             db.session.add(nuevo_historial)
 
-        # 3. Insertar Control de Firmas (pvo_control_firmas)
+        # Paso C: Insertar Registro de Control de Firmas
         firmas_data = data.get('firmas', {})
         nuevas_firmas = PvoControlFirmas(
             id_orden=nueva_orden.id_orden,
@@ -66,7 +69,7 @@ def crear_orden():
         )
         db.session.add(nuevas_firmas)
 
-        # Confirmación atómica final en PostgreSQL
+        # Confirmación final en PostgreSQL
         db.session.commit()
         # -----------------------------------------------------------
 
@@ -77,7 +80,7 @@ def crear_orden():
         }), 201
 
     except Exception as e:
-        # Reversión total si hay algún error
+        # Reversión total ante cualquier falla de integridad/DB
         db.session.rollback()
         return jsonify({
             "error": "Error al procesar la transacción",
@@ -85,6 +88,9 @@ def crear_orden():
         }), 500
 
 
+# ==========================================
+# 2. LISTAR Y CONSULTAR ÓRDENES
+# ==========================================
 @ordenes_bp.route('/', methods=['GET'])
 def listar_ordenes():
     ordenes = PvoOrdenMantenimiento.query.all()
@@ -102,3 +108,23 @@ def listar_ordenes():
         })
         
     return jsonify(resultado), 200
+
+
+@ordenes_bp.route('/<int:id_orden>', methods=['GET'])
+def obtener_orden(id_orden):
+    orden = PvoOrdenMantenimiento.query.get(id_orden)
+    if not orden:
+        return jsonify({"error": "Orden no encontrada"}), 404
+
+    return jsonify({
+        "id_orden": orden.id_orden,
+        "no_orden_oficial": orden.no_orden_oficial,
+        "id_autobus": orden.id_autobus,
+        "id_ruta": orden.id_ruta,
+        "tipo_mantenimiento": orden.tipo_mantenimiento,
+        "subtipo_servicio": orden.subtipo_servicio,
+        "estatus_orden": orden.estatus_orden,
+        "km_en_ingreso": orden.km_en_ingreso,
+        "falla_reportada": orden.falla_reportada,
+        "observaciones_diagnostico": orden.observaciones_diagnostico
+    }), 200
