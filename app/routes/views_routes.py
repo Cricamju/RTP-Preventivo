@@ -6,19 +6,15 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        # Capturamos los campos enviados por el formulario de login.html
         username = request.form.get('username')
         password = request.form.get('password')
 
-        # Buscamos al usuario en sis_usuarios
         usuario = Usuario.query.filter_by(username_tag=username).first()
 
-        # Validamos existencia y contraseña con werkzeug/scrypt
         if usuario and usuario.check_password(password):
             if not usuario.activo:
                 return render_template('login.html', error="El usuario se encuentra inactivo.")
 
-            # Redirección automática según la matriz de roles RBAC de PostgreSQL
             if usuario.rol == 'Administrador':
                 return redirect(url_for('main.dashboard_admin'))
             elif usuario.rol == 'Capturista':
@@ -26,11 +22,15 @@ def login():
             elif usuario.rol == 'Consultor':
                 return redirect(url_for('main.dashboard_consulta'))
         
-        # Si las credenciales son incorrectas
         return render_template('login.html', error="Usuario o contraseña incorrectos")
 
-    # Petición GET: Muestra la pantalla de Login
     return render_template('login.html')
+
+# --- NUEVA RUTA DE LOGOUT ---
+@main_bp.route('/logout')
+def logout():
+    # Redirige al login principal
+    return redirect(url_for('main.login'))
 
 @main_bp.route('/login-support')
 def login_support():
