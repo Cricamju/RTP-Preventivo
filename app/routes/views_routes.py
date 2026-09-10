@@ -14,7 +14,6 @@ def add_header(response):
     response.headers['Expires'] = '-1'
     return response
 
-# Función para convertir el Enum de PostgreSQL a la clave de CSS/Jinja2
 def obtener_rol_key():
     rol_raw = str(session.get('rol', '')).strip()
     if rol_raw in ['Administrador', 'admin', 'Admin']:
@@ -24,6 +23,13 @@ def obtener_rol_key():
     elif rol_raw in ['Consultor', 'consulta', 'Consulta']:
         return 'consulta'
     return 'invitado'
+
+@main_bp.route('/soporte-login')
+@main_bp.route('/login-support')
+def login_support():
+    if 'rol' in session:
+        return redirect(url_for('main.login'))
+    return render_template('login-support.html')
 
 @main_bp.route('/', methods=['GET', 'POST'])
 def login():
@@ -51,8 +57,7 @@ def login():
             session['username'] = usuario.username_tag
 
             flash(f'¡Bienvenido, @{usuario.username_tag}!', 'success')
-            flash('Tip: Explora el menú flotante inferior derecho para cambiar temas.', 'info')
-
+            
             role_key = obtener_rol_key()
             if role_key == 'admin':
                 return redirect(url_for('main.dashboard_admin'))
@@ -72,16 +77,8 @@ def logout():
     flash('Cerró sesión con éxito', 'success')
     return redirect(url_for('main.login'))
 
-@main_bp.route('/soporte-login')
-@main_bp.route('/login-support')
-def login_support():
-    if 'rol' in session:
-        return redirect(url_for('main.login'))
-    return render_template('login-support.html')
-
 # --- DASHBOARDS POR ROL ---
 @main_bp.route('/dashboard/admin')
-@main_bp.route('/dashboard/administrador')
 def dashboard_admin():
     role_key = obtener_rol_key()
     if 'rol' not in session or role_key != 'admin':
@@ -89,7 +86,6 @@ def dashboard_admin():
     return render_template('dashboards/dashboard_admin.html', role=role_key)
 
 @main_bp.route('/dashboard/editor')
-@main_bp.route('/dashboard/capturista')
 def dashboard_editor():
     role_key = obtener_rol_key()
     if 'rol' not in session or role_key != 'editor':
@@ -97,7 +93,6 @@ def dashboard_editor():
     return render_template('dashboards/dashboard_editor.html', role=role_key)
 
 @main_bp.route('/dashboard/consulta')
-@main_bp.route('/dashboard/consultor')
 def dashboard_consulta():
     role_key = obtener_rol_key()
     if 'rol' not in session or role_key != 'consulta':
@@ -106,7 +101,6 @@ def dashboard_consulta():
 
 # --- MÓDULOS OPERATIVOS ---
 @main_bp.route('/modulos/odometro')
-@main_bp.route('/odometro')
 def odometro():
     role_key = obtener_rol_key()
     if 'rol' not in session or role_key not in ['admin', 'editor']:
@@ -114,7 +108,6 @@ def odometro():
     return render_template('modulos/odometro.html', role=role_key)
 
 @main_bp.route('/modulos/gsp')
-@main_bp.route('/gsp')
 def gsp():
     role_key = obtener_rol_key()
     if 'rol' not in session or role_key not in ['admin', 'editor']:
@@ -122,7 +115,6 @@ def gsp():
     return render_template('modulos/gsp.html', role=role_key)
 
 @main_bp.route('/modulos/correctivo')
-@main_bp.route('/correctivo')
 def correctivo():
     role_key = obtener_rol_key()
     if 'rol' not in session or role_key not in ['admin', 'editor']:
@@ -130,7 +122,6 @@ def correctivo():
     return render_template('modulos/correctivo.html', role=role_key)
 
 @main_bp.route('/modulos/reportes')
-@main_bp.route('/reportes')
 def reportes():
     role_key = obtener_rol_key()
     if 'rol' not in session or role_key not in ['admin', 'consulta']:
@@ -138,7 +129,6 @@ def reportes():
     return render_template('modulos/reportes.html', role=role_key)
 
 @main_bp.route('/modulos/ayuda')
-@main_bp.route('/ayuda')
 def ayuda():
     if 'rol' not in session:
         return redirect(url_for('main.login'))

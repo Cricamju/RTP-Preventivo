@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from app.models import CatAutobus, CatRuta, CatPersonalRtp
+from app.models import CatAutobus, CatRuta, CatPersonalRtp, CatFalla
 
 catalogos_bp = Blueprint('catalogos', __name__)
 
@@ -10,7 +10,6 @@ def get_autobuses():
         {
             "id_autobus": a.id_autobus,
             "eco_numero": a.eco_numero,
-            "placa": a.placa,
             "modelo": a.modelo,
             "ano_fabricacion": a.ano_fabricacion
         } for a in autobuses
@@ -40,5 +39,17 @@ def get_personal():
             "categoria": p.categoria,
             "estatus": p.estatus
         } for p in personal
+    ]
+    return jsonify(resultado), 200
+
+@catalogos_bp.route('/fallas', methods=['GET'])
+def get_fallas():
+    fallas = CatFalla.query.filter_by(activo=True).all()
+    resultado = [
+        {
+            "id_falla": f.id_falla,
+            "sistema": f.sistema,
+            "descripcion_falla": f.descripcion_falla
+        } for f in fallas
     ]
     return jsonify(resultado), 200

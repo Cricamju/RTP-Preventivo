@@ -2,7 +2,6 @@ from app.database import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import Enum
 
-# Valores exactos registrados en la DB
 ROL_USUARIO_ENUM = Enum('Administrador', 'Capturista', 'Consultor', name='rol_usuario')
 
 class Usuario(db.Model):
@@ -23,7 +22,7 @@ class Usuario(db.Model):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)\
+        return check_password_hash(self.password_hash, password)
 
         
 # ==========================================
@@ -34,13 +33,10 @@ class CatAutobus(db.Model):
 
     id_autobus = db.Column(db.Integer, primary_key=True, autoincrement=True)
     eco_numero = db.Column(db.String(20), unique=True, nullable=False)
-    placa = db.Column(db.String(15), unique=True, nullable=False)
     modelo = db.Column(db.String(50), nullable=True)
-    # MAPEAMOS 'ano_fabricacion' EN PYTHON A LA COLUMNA REAL 'año_fabricacion' EN POSTGRESQL:
     ano_fabricacion = db.Column('año_fabricacion', db.Integer, nullable=True)
     activo = db.Column(db.Boolean, default=True, nullable=False)
 
-    # Relaciones
     historial_kilometraje = db.relationship('OpHistorialKilometraje', backref='autobus', lazy=True)
     ordenes_mantenimiento = db.relationship('PvoOrdenMantenimiento', backref='autobus', lazy=True)
 
@@ -51,9 +47,18 @@ class CatRuta(db.Model):
     codigo_ruta = db.Column(db.String(20), unique=True, nullable=False)
     descripcion = db.Column(db.String(150), nullable=True)
 
-    # Relaciones
     ordenes_mantenimiento = db.relationship('PvoOrdenMantenimiento', backref='ruta', lazy=True)
 
+class CatFalla(db.Model):
+    __tablename__ = 'cat_fallas'
+
+    id_falla = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    sistema = db.Column(db.String(100), nullable=False)
+    descripcion_falla = db.Column(db.String(200), nullable=False)
+    activo = db.Column(db.Boolean, default=True, nullable=False)
+    creado_en = db.Column(db.DateTime, server_default=db.func.now())
+
+    ordenes_mantenimiento = db.relationship('PvoOrdenMantenimiento', backref='falla_estandar', lazy=True)
 
 class CatPersonalRtp(db.Model):
     __tablename__ = 'cat_personal_rtp'
@@ -87,6 +92,7 @@ class PvoOrdenMantenimiento(db.Model):
     no_orden_oficial = db.Column(db.String(30), unique=True, nullable=False)
     id_autobus = db.Column(db.Integer, db.ForeignKey('cat_autobuses.id_autobus'), nullable=False)
     id_ruta = db.Column(db.Integer, db.ForeignKey('cat_rutas.id_ruta'), nullable=False)
+    id_falla = db.Column(db.Integer, db.ForeignKey('cat_fallas.id_falla'), nullable=True)
     tipo_mantenimiento = db.Column(db.String(50), nullable=True)
     subtipo_servicio = db.Column(db.String(50), nullable=True)
     estatus_orden = db.Column(db.String(30), nullable=True)
@@ -98,7 +104,6 @@ class PvoOrdenMantenimiento(db.Model):
     observaciones_diagnostico = db.Column(db.Text, nullable=True)
     creado_en = db.Column(db.DateTime, server_default=db.func.now())
 
-    # Relaciones
     firmas = db.relationship('PvoControlFirmas', backref='orden_mantenimiento', uselist=False, lazy=True)
 
 
@@ -112,7 +117,6 @@ class PvoControlFirmas(db.Model):
     credencial_jefe_cierra = db.Column(db.Integer, db.ForeignKey('cat_personal_rtp.credencial'), nullable=True)
     credencial_diagnosticador = db.Column(db.Integer, db.ForeignKey('cat_personal_rtp.credencial'), nullable=True)
 
-    # Relaciones ORM para consultar los datos del personal firmado fácilmente
     operador = db.relationship('CatPersonalRtp', foreign_keys=[credencial_operador])
     jefe_abre = db.relationship('CatPersonalRtp', foreign_keys=[credencial_jefe_abre])
     jefe_cierra = db.relationship('CatPersonalRtp', foreign_keys=[credencial_jefe_cierra])
