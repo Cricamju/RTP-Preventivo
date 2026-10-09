@@ -1,0 +1,122 @@
+/* =========================================
+   HACK DE LIBERACIÓN DEL CONTENEDOR (Base.html)
+   ========================================= */
+main.content-area { padding: 0 !important; display: block !important; }
+
+/* =========================================
+   MÓDULO GSP (BARRA DELGADA Y CRISTALINA)
+   ========================================= */
+
+.gsp-sticky-header {
+    position: sticky; top: 85px; z-index: 100; width: 100%;
+    background: rgba(20, 25, 20, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    padding: 12px 40px; border-bottom: 2px solid var(--rtp-green); box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+}
+
+.header-content-inline { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+.inline-title h2 { margin: 0; color: var(--rtp-green); font-size: 1.4rem; white-space: nowrap; }
+
+.inline-search { flex: 1; max-width: 500px; }
+#search-input {
+    width: 100%; padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.5); color: var(--text-light); outline: none; transition: border 0.3s;
+}
+#search-input:focus { border-color: var(--rtp-green); background: rgba(0, 0, 0, 0.8); }
+
+.inline-controls { display: flex; align-items: center; gap: 15px; }
+
+.btn-primary {
+    background-color: var(--rtp-green); color: white; border: none; border-radius: 8px;
+    padding: 8px 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 0.9rem;
+}
+.btn-primary:hover { background-color: #007a33; }
+.btn-save { background-color: #2563eb; }
+.btn-save:hover { background-color: #1d4ed8; }
+
+/* 🟢 BOTONES DE EXPORTACIÓN */
+.btn-export {
+    border: none; border-radius: 8px; padding: 8px 16px; font-weight: 600;
+    cursor: pointer; transition: all 0.3s ease; font-size: 0.9rem; color: white;
+}
+.btn-export.excel { background-color: #16a34a; } /* Verde Excel */
+.btn-export.excel:hover { background-color: #15803d; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(22,163,74,0.3); }
+
+.btn-export.pdf { background-color: #dc2626; } /* Rojo PDF */
+.btn-export.pdf:hover { background-color: #b91c1c; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(220,38,38,0.3); }
+
+.view-mode-badge, .btn-toggle-mode { padding: 8px 15px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+.btn-toggle-mode { cursor: pointer; transition: all 0.3s ease; border: none; outline: none; }
+.readonly { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+.editable { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+/* 🟢 TARJETA Y TABLA COMPACTA */
+.gsp-card {
+    max-width: 98%; width: 100%; background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border); border-radius: 16px; padding: 20px; margin: 20px auto 50px auto; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.table-wrapper { 
+    border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.15); 
+    background: rgba(0, 0, 0, 0.3); overflow-x: auto; 
+}
+
+.excel-table { 
+    width: 100%; min-width: 1410px; /* 🟢 Fuerza scroll lateral si la pantalla es pequeña */
+    table-layout: fixed; /* 🟢 Obliga a respetar los tamaños del colgroup */
+    border-collapse: collapse; color: var(--text-light); font-size: 0.85rem; text-align: center; 
+}
+
+/* 🟢 LA MAGIA SÓLIDA DE LAS CABECERAS */
+.excel-table th {
+    background: #151815; /* Sólido puro para tapar las filas debajo */
+    padding: 10px 5px; font-size: 0.8rem; font-weight: 600; cursor: pointer; user-select: none;
+    white-space: nowrap; border-bottom: 2px solid var(--rtp-green); border-right: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative; z-index: 40; /* Crucial para el JS */
+    transition: background 0.2s, color 0.2s;
+}
+.excel-table th:hover { color: var(--rtp-green); background: rgba(255, 255, 255, 0.05); }
+
+.excel-table td { padding: 0; position: relative; border-bottom: 1px solid rgba(255, 255, 255, 0.1); border-right: 1px solid rgba(255, 255, 255, 0.1); }
+
+.excel-input {
+    width: 100%; height: 100%; min-height: 38px; background: transparent; border: none;
+    color: var(--text-light); padding: 6px 8px; font-family: inherit; font-size: 0.85rem; text-align: center; outline: none; box-sizing: border-box;
+}
+.excel-input[type="date"] { color-scheme: dark; font-size: 0.8rem; }
+.excel-input:focus { background: rgba(0, 147, 69, 0.15); box-shadow: inset 0 0 0 2px var(--rtp-green); }
+.excel-input:read-only { cursor: default; color: rgba(255, 255, 255, 0.6); background: rgba(0, 0, 0, 0.15); }
+
+select.excel-input { appearance: none; cursor: pointer; text-align: center; text-overflow: ellipsis; }
+select.excel-input option { background: #1a1a1a; color: white; }
+.status-detenida { color: #ef4444 !important; font-weight: 600; background: rgba(239, 68, 68, 0.05) !important; }
+.status-operando { color: #10b981 !important; font-weight: 600; }
+
+.btn-delete-row {
+    background: transparent; border: none; color: #ef4444; cursor: pointer;
+    font-size: 1.1rem; padding: 5px; width: 100%; height: 100%; transition: background 0.2s;
+}
+.btn-delete-row:hover { background: rgba(239, 68, 68, 0.15); }
+
+/* 🟢 PAGINACIÓN */
+.pagination-wrapper { display: flex; justify-content: center; width: 100%; padding: 20px 0; margin-top: 20px; background: rgba(0, 0, 0, 0.4); border-radius: 12px; border: 1px solid rgba(0, 147, 69, 0.3); }
+.pagination-container { display: flex; gap: 10px; flex-wrap: wrap; }
+.page-btn {
+    background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text-light); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem; transition: all 0.2s;
+}
+.page-btn:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
+.page-btn.active { background: var(--rtp-green); color: white; border-color: var(--rtp-green); box-shadow: 0 4px 10px rgba(0,147,69,0.3); }
+
+/* =========================================
+   ADAPTACIONES MODO CLARO
+   ========================================= */
+body.light-theme .gsp-sticky-header { background: rgba(250, 250, 250, 0.9); border-bottom-color: var(--rtp-green); }
+body.light-theme .gsp-card { background: rgba(255, 255, 255, 0.95); border-color: rgba(0, 147, 69, 0.2); }
+body.light-theme .excel-table th { background: #e5e7eb; color: #374151; border-right-color: #d1d5db;}
+body.light-theme .excel-table td { border-color: #e5e7eb; }
+body.light-theme #search-input { background: #ffffff; border-color: #e5e7eb; color: #111827; }
+body.light-theme .excel-input { color: #111827; }
+body.light-theme .excel-input[type="date"] { color-scheme: light; }
+body.light-theme .excel-input:read-only { color: #4b5563; background: #f9fafb; }
+body.light-theme select.excel-input option { background: #ffffff; color: #111827; }
+body.light-theme .pagination-wrapper { background: rgba(255, 255, 255, 0.5); }
+body.light-theme .page-btn { color: #111827; border-color: #d1d5db; }

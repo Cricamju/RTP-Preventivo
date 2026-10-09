@@ -32,7 +32,7 @@ body.font-san-francisco { font-family: 'San Francisco', system-ui, sans-serif !i
 /* Clases dinámicas de Transición de Colores */
 .theme-transition-manual, 
 .theme-transition-manual * {
-    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, background-image 0.4s ease !important;
+    transition: background-color 1s ease, color 1s ease, border-color 1s ease, background-image 1s ease !important;
 }
 
 .theme-transition-auto, 
@@ -53,7 +53,7 @@ body.light-theme {
     position: fixed;
     bottom: 30px;
     right: 30px;
-    z-index: 2000;
+    z-index: 5000;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -256,7 +256,7 @@ input {
     position: fixed;
     top: 125px; /* Posición original */
     right: 30px;
-    z-index: 3000;
+    z-index: 5000;
     pointer-events: none;
     display: flex;
     flex-direction: column; /* Apilar una debajo de otra */

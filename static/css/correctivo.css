@@ -1,0 +1,122 @@
+/* =========================================
+   HACK DE LIBERACIÓN DEL CONTENEDOR
+   ========================================= */
+main.content-area { padding: 0 !important; display: block !important; }
+
+/* 🟢 TOPBAR GLASSMORPHISM */
+.correctivo-sticky-header {
+    position: sticky; top: 85px; z-index: 100; width: 100%;
+    background: rgba(20, 25, 20, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    padding: 12px 40px; border-bottom: 2px solid var(--rtp-green); box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+}
+
+.header-content-inline { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+.inline-title h2 { margin: 0; color: var(--rtp-green); font-size: 1.4rem; white-space: nowrap; }
+
+.inline-search { flex: 1; max-width: 600px; display: flex; gap: 10px; }
+#input-consecutivo {
+    flex: 1; padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.5); color: var(--text-light); outline: none; transition: border 0.3s;
+    font-size: 1.1rem; text-align: center; font-weight: bold; letter-spacing: 2px;
+}
+#input-consecutivo:focus { border-color: var(--rtp-green); background: rgba(0, 0, 0, 0.8); }
+
+.btn-search { background-color: var(--rtp-green); color: white; border: none; border-radius: 8px; padding: 0 20px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+.btn-search:hover { background-color: #007a33; }
+
+.btn-export.pdf { background-color: #dc2626; border: none; border-radius: 8px; padding: 10px 20px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; color: white; }
+.btn-export.pdf:hover:not(:disabled) { background-color: #b91c1c; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(220,38,38,0.3); }
+.btn-export.pdf:disabled { background-color: #555; color: #888; cursor: not-allowed; }
+
+/* =========================================
+   🟢 CONTENEDOR PRINCIPAL (MÁS DELGADO Y UX)
+   ========================================= */
+.correctivo-card {
+    width: fit-content; /* 🟢 Hace que el box abrace a la hoja A4 */
+    background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border); 
+    border-radius: 20px; /* Bordes suaves en el box */
+    padding: 30px 40px;  /* 🟢 Padding ajustado para que sobresalga lo justo */
+    margin: 30px auto 50px auto; 
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    display: flex; justify-content: center;
+}
+
+.document-preview-wrapper { display: flex; flex-direction: column; align-items: center; gap: 30px; }
+.empty-state { text-align: center; color: var(--text-muted); padding: 50px 100px; }
+.empty-state .empty-icon { font-size: 4rem; margin-bottom: 20px; opacity: 0.5; }
+.empty-state h3 { font-size: 1.5rem; margin-bottom: 10px; color: var(--text-light); }
+
+/* =========================================
+   🟢 LA MAGIA DEL TEMPLATE OVERLAY Y BORDES
+   ========================================= */
+.document-a4 {
+    position: relative; 
+    width: 21.59cm; 
+    height: 27.94cm; /* Tamaño Carta exacto */
+    background: white; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+    border-radius: 12px; /* 🟢 Bordes redondeados en los documentos (UX) */
+    overflow: hidden; 
+}
+
+.template-bg {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 1; object-fit: fill;
+}
+
+.floating-data {
+    position: absolute;
+    z-index: 2; /* Encima de la imagen */
+    font-family: 'Arial', sans-serif;
+    font-size: 10pt;
+    color: black;
+    font-weight: bold;
+    /* ⚠️ MANTÉN ESTE BORDE ROJO HASTA QUE QUEDE PERFECTO: */
+    border: 1px solid rgba(220, 38, 38, 0.6); 
+    display: flex; align-items: center; /* Centra el texto verticalmente */
+}
+
+/* =========================================
+   ⚠️ AJUSTE DE COORDENADAS RECALIBRADAS ⚠️
+   ========================================= */
+/* Hoja 1 */
+.pos-fecha { top: 7.3%; left: 68%; width: 22%; height: 2.5%; justify-content: center;}
+.pos-folio { top: 13.5%; left: 68%; width: 15%; height: 2.5%; justify-content: center; }
+.pos-consecutivo { top: 10%; left: 85%; width: 12%; height: 2.5%; justify-content: center; font-size: 12pt; }
+
+.pos-eco { top: 26.5%; left: 3%; width: 18%; height: 2.5%; justify-content: center; }
+.pos-ruta { top: 26.5%; left: 21%; width: 20%; height: 2.5%; justify-content: center; }
+.pos-tipo { top: 26.5%; left: 41%; width: 15%; height: 2.5%; justify-content: center; }
+.pos-km { top: 26.5%; left: 56%; width: 15%; height: 2.5%; justify-content: center; }
+
+.pos-falla { top: 32%; left: 3%; width: 94%; height: 4%; justify-content: flex-start; padding-left: 10px; }
+
+/* Hoja 2 (Ajusta esto cuando veas la hoja 2) */
+.pos-operador { top: 15%; left: 5%; width: 25%; justify-content: center; }
+.pos-jefe { top: 15%; left: 35%; width: 25%; justify-content: center; }
+.pos-jud { top: 15%; left: 70%; width: 25%; justify-content: center; }
+
+
+/* =========================================
+   🟢 IMPRESIÓN LIMPIA (Oculta el sistema)
+   ========================================= */
+@media print {
+    body { background: none !important; padding: 0 !important; margin: 0 !important; }
+    
+    .sidebar, header, .correctivo-sticky-header, .empty-state, footer, .toast-container, .fab-container {
+        display: none !important;
+    }
+
+    .correctivo-card { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
+    .document-preview-wrapper { gap: 0; }
+    
+    /* En el papel físico, le quitamos los bordes redondeados para que salga normal */
+    .document-a4 { box-shadow: none !important; border-radius: 0 !important; page-break-after: always; }
+    
+    .floating-data { border: none !important; } /* Al imprimir se quita el borde rojo automáticamente */
+}
+
+body.light-theme .correctivo-sticky-header { background: rgba(250, 250, 250, 0.9); border-bottom-color: var(--rtp-green); }
+body.light-theme .correctivo-card { background: rgba(255, 255, 255, 0.95); border-color: rgba(0, 147, 69, 0.2); }
+body.light-theme #input-consecutivo { background: #ffffff; border-color: #e5e7eb; color: #111827; }

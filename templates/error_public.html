@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error {{ codigo }} | RTP-Preventivo</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/logos/logo_oficial.png') }}" type="image/png">
+    <!-- Hojas de estilo separadas -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base_public.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/error.css') }}">
+</head>
+<body>
+    <div class="overlay"></div>
+    
+    <header class="glass-panel">
+        <a href="/" class="header-left" style="text-decoration: none;">
+            <img src="{{ url_for('static', filename='img/logos/logo-rtp.png') }}" alt="Logo Oficial RTP" class="header-logo">
+            <h1>RED DE TRANSPORTE DE PASAJEROS</h1>
+        </a>
+    </header>
+
+    <main class="error-container">
+        <div class="error-card">
+            <h1>{{ codigo }}</h1>
+            <h2>{{ mensaje }}</h2>
+            <p>{{ descripcion }}</p>
+            <a href="/" class="back-btn-error">← Ir a Iniciar Sesión</a>
+        </div>
+    </main>
+
+    {% include 'components/footer.html' %}
+</body>
+</html>
