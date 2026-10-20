@@ -1,0 +1,3 @@
+<footer class="glass-panel">
+    &copy; 2026 RED DE TRANSPORTE DE PASAJEROS | Sistema Módulo Preventivo
+</footer>

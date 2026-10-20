@@ -1,0 +1,174 @@
+/* static/css/base/base_public.css */
+@import url('../components/accessibility.css');
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+:root {
+    --rtp-green: #009345; 
+    --rtp-green-hover: #007537;
+    --text-light: #ffffff;
+    --text-muted: #cbd5e1;
+    --glass-bg: rgba(20, 25, 20, 0.65);
+    --glass-border: transparent;
+}
+
+/* Fondo Oscuro por Defecto */
+body {
+    margin: 0;
+    padding: 0;
+    padding-top: 85px;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-color: #121814; 
+    background-image: url('../../img/fondos/public/RTP-Login-Dark.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: var(--text-light);
+    overflow-x: hidden;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 0;
+}
+
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--glass-border);
+    border-top: 1px solid var(--glass-border);
+}
+
+main {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    position: fixed;      
+    top: 0;               
+    left: 0;                
+    width: 100%;            
+    box-sizing: border-box; 
+    z-index: 1000;          
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); 
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-right {
+    position: relative;
+}
+
+.header-logo {
+    height: 55px;
+    width: auto;
+    object-fit: contain;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--rtp-green);
+}
+
+.login-dropdown {
+    position: fixed;
+    top: 75px;
+    right: 40px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    width: 250px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    z-index: 1100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-15px);
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s ease;
+}
+
+.login-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.login-dropdown .input-group {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.login-dropdown .input-group input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+footer {
+    padding: 15px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Fondo para el Modo Claro con ruta relativa limpia */
+body.light-theme {
+    background-image: url('../../img/fondos/public/RTP-Login.png') !important;
+}
+
+@media (max-width: 600px) {
+    header {
+        flex-direction: column;
+        padding: 15px;
+        text-align: center;
+        gap: 10px;
+    }
+
+    header h1 {
+        font-size: 1rem;
+        letter-spacing: 1px;
+    }
+
+    .header-logo {
+        height: 45px;
+    }
+
+    .login-dropdown {
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 350px;
+        top: 130px;
+    }
+}

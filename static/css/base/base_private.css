@@ -1,0 +1,365 @@
+/* static/css/base_private.css */
+@import url('accessibility.css');
+
+:root {
+    --rtp-green: #009345; 
+    --rtp-green-hover: #007537;
+    --text-light: #ffffff;
+    --text-muted: #cbd5e1;
+    --glass-bg: rgba(20, 25, 20, 0.65);
+    --glass-border: transparent; 
+}
+
+/* Reset y Body */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    padding: 0;
+    padding-top: 85px;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-image: url('../RTP-Login.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: var(--text-light);
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+}
+
+header {
+    position: fixed;
+    top: 0; left: 0; width: 100%;
+    height: 85px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    z-index: 1000;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-logo { height: 50px; width: auto; }
+header h1 { margin: 0; font-size: 1.2rem; color: var(--rtp-green); letter-spacing: 2px;}
+
+/* =========================================
+   NUEVO MENÚ DEL PERFIL
+   ========================================= */
+.user-profile-wrapper {
+    position: relative;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 147, 69, 0.15);
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 147, 69, 0.3);
+    color: var(--text-light);
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.user-profile:hover {
+    background: rgba(0, 147, 69, 0.25);
+    border-color: rgba(0, 147, 69, 0.5);
+}
+
+.dropdown-arrow {
+    margin-left: 10px;
+}
+
+.user-dropdown {
+    position: fixed;
+    top: 75px;
+    right: 40px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 10px;
+    width: 200px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: none;
+    flex-direction: column;
+    z-index: 1100;
+}
+
+.user-dropdown.show { display: flex; }
+
+.dropdown-link {
+    padding: 12px 15px;
+    color: #ef4444;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.3s;
+    white-space: nowrap;
+}
+
+.dropdown-link:hover { background: rgba(239, 68, 68, 0.15); }
+
+body.light-theme .user-dropdown {
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(0, 147, 69, 0.3);
+}
+
+/* =========================================
+   SIDEBAR TIPO OPERA GX
+   ========================================= */
+.sidebar {
+    position: fixed;
+    top: 85px;
+    left: 0;
+    width: 75px;
+    height: calc(100vh - 85px);
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border-right: 1px solid var(--glass-border);
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    justify-content: space-between;
+}
+
+.sidebar:hover {
+    width: 18rem;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.3);
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.sidebar-link {
+    padding: 15px 22px;
+    color: var(--text-light);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.sidebar-link:hover {
+    background: rgba(0, 147, 69, 0.15);
+    color: var(--rtp-green);
+}
+
+.sidebar-link.active {
+    border-left: 4px solid var(--rtp-green);
+    background: rgba(0, 147, 69, 0.2);
+    color: var(--rtp-green);
+}
+
+.sidebar-link .icon {
+    font-size: 1.3rem;
+    min-width: 30px;
+    text-align: center;
+}
+
+.sidebar-link .text {
+    margin-left: 15px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.sidebar:hover .sidebar-link .text {
+    opacity: 1;
+    transition-delay: 0.1s;
+}
+
+main.content-area {
+    margin-left: 75px;
+    padding: 40px;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+footer.glass-panel {
+    padding: 15px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    width: 100%;
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--glass-border);
+    margin-top: auto;
+    z-index: 10;
+}
+
+body.theme-admin { background-image: url('/static/img/fondos/admin/RTP-Admin-Dark.png'); }
+body.theme-editor { background-image: url('/static/img/fondos/editor/RTP-Editor-Dark.png'); }
+body.theme-consulta { background-image: url('/static/img/fondos/consulta/RTP-Consulta-Dark.png'); }
+
+body.light-theme.theme-admin { background-image: url('/static/img/fondos/admin/RTP-Admin.png') !important; }
+body.light-theme.theme-editor { background-image: url('/static/img/fondos/editor/RTP-Editor.png') !important; }
+body.light-theme.theme-consulta { background-image: url('/static/img/fondos/consulta/RTP-Consulta.png') !important; }
+
+.welcome-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 100%;
+}
+
+.welcome-card h2 {
+    color: var(--rtp-green);
+    margin-top: 0;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+}
+
+@media (max-width: 768px) {
+    header {
+        padding: 10px 20px;
+        height: 70px;
+    }
+    header h1 {
+        display: none;
+    }
+    
+    main.content-area {
+        margin-left: 0;
+        padding: 20px;
+        padding-bottom: 110px; 
+        min-height: calc(100vh - 70px);
+    }
+
+    .sidebar {
+        top: auto;
+        bottom: 20px; 
+        left: 50%;
+        transform: translateX(-50%); 
+        width: 92%; 
+        height: 65px;
+        border-radius: 35px; 
+        flex-direction: row;
+        justify-content: space-evenly;
+        padding: 0;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), bottom 0.4s ease !important;
+    }
+
+    .sidebar:hover,
+    .sidebar:active,
+    .sidebar:focus-within {
+        width: 92% !important;
+    }
+
+    .sidebar.sidebar-hidden {
+        transform: translate(-50%, 150%);
+        bottom: -100px;
+    }
+    
+    .sidebar.sidebar-at-bottom {
+        bottom: 75px;
+    }
+
+    .sidebar-nav {
+        flex-direction: row;
+        justify-content: space-evenly;
+        align-items: center;
+        width: 100%;
+        gap: 0;
+        display: contents;
+    }
+    
+    .sidebar-bottom {
+        display: flex;
+        align-items: center;
+        margin-right: 5px;
+        display: contents;
+    }
+
+    .sidebar-link {
+        flex: 1;
+        padding: 10px 0;
+        border-left: none; 
+        flex-direction: column; 
+        align-items: center;
+        justify-content: center;
+        border-radius: 0; 
+        height: 100%;
+    }
+
+    .sidebar-link .text {
+        display: none; 
+    }
+
+    .sidebar-link .icon {
+        margin-left: 0;
+        font-size: 1.4rem;
+    }
+
+    .sidebar-link.active {
+        border-left: none;
+        background: rgba(0, 147, 69, 0.2);
+        color: var(--rtp-green);
+        box-shadow: none;
+    }
+
+    .sidebar-link.active .icon {
+        color: var(--rtp-green);
+    }
+
+    .a11y-container {
+        bottom: 100px;
+        right: 15px;
+        transform: scale(0.85);
+    }
+
+    .user-dropdown {
+        top: 65px;
+        right: 20px;
+        width: 180px;
+    }
+}
