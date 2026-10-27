@@ -1,104 +1,262 @@
-/* static/js/odometro.js */
+/* static/js/modulos/odometro.js */
 
 const tableBody = document.getElementById('odometro-body');
-const isAdmin = userRole === 'admin';
+const isAdmin = userRole === 'admin' || userRole === 'administrador';
 let isEditingMode = false;
 
-// 🟢 CONFIGURACIÓN DE PAGINACIÓN
 let currentPage = 1;
 const rowsPerPage = 100; 
 
-// 🟢 GENERADOR DE 150 DATOS (INCLUYE DATOS FANTASMA: fecha_alta y servicios)
-let data = [];
-for (let i = 1; i <= 150; i++) {
-    data.push({
-        id: i,
-        modulo: '04',
-        economico: (6000 + i).toString(),
-        fecha_alta: `200${4 + (i%5)}-0${(i%9)+1}-15`, // Dato fantasma 👻
-        fechaActual: `2026-08-${(i%28 + 1).toString().padStart(2, '0')}`,
-        kmActual: (300000 + i * 150.5).toFixed(1),
-        fechaMant: `2026-01-${(i%28 + 1).toString().padStart(2, '0')}`,
-        kmMant: (280000 + i * 100).toFixed(1),
-        kmAcum: (20000 + i * 50.5).toFixed(1),
-        dias: (100 + i % 50).toString(),
-        orden: (10000 + i).toString(),
-        servicios: (50 + i % 100).toString(), // Dato fantasma 👻
-        estado: i % 8 === 0 ? 'Detenida' : 'Operando'
-    });
+const modelosFlota = [
+    "Volvo Caio Access 2020",
+    "Yutong ZK6990HGQ 2023",
+    "Dina Linner 2017",
+    "Volvo Procity 2016",
+    "Volvo Torino 2020",
+    "Mercedes Benz Cosmopolitan 2016",
+    "Volvo Articulado Metrobús"
+];
+
+// Obtener el intervalo base y reglas según el modelo de autobús
+function obtenerIntervaloBaseYModelo(modelo) {
+    if (!modelo) return { intervalo: 5000, tipo: 'volvo_sencillo' };
+    const m = modelo.toLowerCase();
+    if (m.includes('yutong')) return { intervalo: 15000, tipo: 'yutong' };
+    if (m.includes('dina')) return { intervalo: 15000, tipo: 'dina' };
+    if (m.includes('masa')) return { intervalo: 12000, tipo: 'masa' };
+    if (m.includes('cosmopolitan')) return { intervalo: 10000, tipo: 'cosmopolitan' };
+    return { intervalo: 5000, tipo: 'volvo_sencillo' }; // Volvo Torino, Caio Access, Procity, Articulados
 }
 
-let filteredData = [...data];
-
-// 🟢 ALGORITMO ANTI-DESGARRE DE ENCABEZADOS
-function adjustStickyHeaders() {
-    const panel = document.getElementById('sticky-panel');
-    const wrapper = document.querySelector('.table-wrapper');
-    const ths = document.querySelectorAll('#odometro-table thead th');
+function obtenerCombinacionServicios(kmAcum, modelo) {
+    const k = Math.round(kmAcum);
+    const { intervalo, tipo } = obtenerIntervaloBaseYModelo(modelo);
     
-    if (!panel || !wrapper || ths.length === 0) return;
+    if (tipo === 'yutong' || tipo === 'dina') {
+        const ciclo = k % 480000; // Ciclo máximo de referencia del manual
+        if (ciclo === 0 && k > 0) return { letras: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'], proximoKm: k };
+        let letras = [];
+        if (k % 15000 === 0) letras.push('A');
+        if (k % 30000 === 0) letras.push('B');
+        if (k % 45000 === 0) letras.push('C');
+        if (k % 60000 === 0) letras.push('D');
+        if (k % 90000 === 0) letras.push('E');
+        if (k % 120000 === 0) letras.push('F');
+        if (k % 240000 === 0) letras.push('G');
+        if (k % 480000 === 0) letras.push('H');
+        if (letras.length === 0) {
+            // Si cae en un rango intermedio, determinamos el servicio base más cercano
+            const resto = k % 15000;
+            letras.push(resto < 7500 ? 'A' : 'B');
+        }
+        return { letras: letras, proximoKm: Math.ceil(k / 15000) * 15000 || 15000 };
+    } else if (tipo === 'masa') {
+        let letras = [];
+        if (k % 12000 === 0) letras.push('A');
+        if (k % 24000 === 0) letras.push('B');
+        if (k % 36000 === 0) letras.push('C');
+        if (k % 48000 === 0) letras.push('D');
+        if (k % 60000 === 0) letras.push('E');
+        if (k % 72000 === 0) letras.push('F');
+        if (k % 96000 === 0) letras.push('G');
+        if (k % 120000 === 0) letras.push('H');
+        if (letras.length === 0) letras.push('A');
+        return { letras: letras, proximoKm: Math.ceil(k / 12000) * 12000 || 12000 };
+    } else if (tipo === 'cosmopolitan') {
+        let letras = [];
+        if (k % 10000 === 0) letras.push('A');
+        if (k % 20000 === 0) letras.push('B');
+        if (k % 30000 === 0) letras.push('C');
+        if (k % 60000 === 0) letras.push('D');
+        if (k % 90000 === 0) letras.push('E');
+        if (k % 120000 === 0) letras.push('F');
+        if (k % 240000 === 0) letras.push('G');
+        if (k % 480000 === 0) letras.push('H');
+        if (letras.length === 0) letras.push('A');
+        return { letras: letras, proximoKm: Math.ceil(k / 10000) * 10000 || 10000 };
+    } else {
+        // Volvo Sencillos / Articulados (Base 5000 km)[cite: 20, 48]
+        let letras = [];
+        if (k % 5000 === 0) letras.push('A');
+        if (k % 15000 === 0) letras.push('B');
+        if (k % 20000 === 0) letras.push('C');
+        if (k % 30000 === 0) letras.push('D');
+        if (k % 45000 === 0) letras.push('E');
+        if (k % 60000 === 0) letras.push('F');
+        if (k % 120000 === 0) letras.push('G');
+        if (k % 240000 === 0) letras.push('H');
+        if (k % 480000 === 0) letras.push('I');
+        if (letras.length === 0) letras.push('A');
+        return { letras: letras, proximoKm: Math.ceil(k / 5000) * 5000 || 5000 };
+    }
+}
 
-    const rect = panel.getBoundingClientRect();
-    const panelBottom = Math.max(rect.bottom, 85); 
+function calcularSemaforoMantenimiento(kmAcum, modelo) {
+    const k = parseFloat(kmAcum) || 0;
+    const { intervalo } = obtenerIntervaloBaseYModelo(modelo);
+    const remainder = k % intervalo;
+    const nextMilestone = Math.floor(k / intervalo + 1) * intervalo;
+    const distToNext = nextMilestone - k;
 
-    const wrapperRect = wrapper.getBoundingClientRect();
-    const theadHeight = document.querySelector('#odometro-table thead').offsetHeight;
+    const servInfo = obtenerCombinacionServicios(nextMilestone, modelo);
+    const tipoServicioStr = servInfo.letras.join(' + ');
 
-    let offset = 0;
-    if (wrapperRect.top < panelBottom) {
-        offset = panelBottom - wrapperRect.top;
-        const maxOffset = wrapperRect.height - theadHeight;
-        if (offset > maxOffset) offset = maxOffset;
+    let colorSemaforo = "verde"; 
+    let etiquetaSemaforo = `Óptimo (${tipoServicioStr})`;
+    let prioridadOrden = 3; 
+
+    if (distToNext <= 1000 && distToNext >= 0) {
+        colorSemaforo = "amarillo";  
+        etiquetaSemaforo = `Próximo (${tipoServicioStr})`;
+        prioridadOrden = 2;
+    } else if (remainder > 0 && remainder <= 3000) {
+        colorSemaforo = "rojo";      
+        etiquetaSemaforo = `Vencido (${tipoServicioStr})`;
+        prioridadOrden = 1;
+    } else {
+        colorSemaforo = "verde";     
+        etiquetaSemaforo = `Seguro (${tipoServicioStr})`;
+        prioridadOrden = 3;
     }
 
-    ths.forEach(th => {
-        th.style.transform = `translateY(${offset}px)`;
-        if(offset > 0) {
-            th.style.boxShadow = '0 5px 10px rgba(0,0,0,0.4)';
-        } else {
-            th.style.boxShadow = 'none';
-        }
-    });
+    return { 
+        color: colorSemaforo, 
+        texto: etiquetaSemaforo, 
+        servicioTexto: tipoServicioStr,
+        numLetras: servInfo.letras.length,
+        prioridad: prioridadOrden,
+        metaKm: nextMilestone 
+    };
 }
 
-window.addEventListener('scroll', adjustStickyHeaders);
-window.addEventListener('resize', adjustStickyHeaders);
+let data = [];
+const modulosList = ['01', '02', '03', '04', '05', '06', '07'];
+
+let globalId = 1;
+modulosList.forEach((mod) => {
+    for (let i = 1; i <= 150; i++) {
+        const modeloAsignado = modelosFlota[i % modelosFlota.length];
+        const { intervalo } = obtenerIntervaloBaseYModelo(modeloAsignado);
+        
+        const multiplier = ((i * 7) % 35) + 5; // Genera rangos variados de kilometraje
+        const baseMilestone = intervalo * multiplier;
+
+        let kmAcumSimulado = 0;
+        const statusSelector = i % 5;
+
+        if (statusSelector === 0) {
+            kmAcumSimulado = baseMilestone + ((i * 37) % 2500) + 200; 
+        } else if (statusSelector === 1 || statusSelector === 2) {
+            kmAcumSimulado = baseMilestone - (((i * 23) % 700) + 100); 
+        } else {
+            kmAcumSimulado = baseMilestone - (((i * 59) % 4000) + 1000); 
+        }
+
+        if (kmAcumSimulado < 2000) kmAcumSimulado = 3500;
+
+        const estadoMant = calcularSemaforoMantenimiento(kmAcumSimulado, modeloAsignado);
+
+        data.push({
+            id: globalId++,
+            modulo: mod,
+            economico: (6000 + (parseInt(mod) * 200) + i).toString(),
+            modelo: modeloAsignado,
+            fecha_alta: `200${4 + (i%5)}-0${(i%9)+1}-15`,
+            fechaActual: `2026-08-${(i%28 + 1).toString().padStart(2, '0')}`,
+            kmActual: (kmAcumSimulado + 120.5).toFixed(1),
+            fechaMant: `2026-01-${(i%28 + 1).toString().padStart(2, '0')}`,
+            kmMant: (kmAcumSimulado - 4500).toFixed(1),
+            kmAcum: kmAcumSimulado.toFixed(1),
+            dias: (30 + (i % 90)).toString(),
+            orden: (10000 + i).toString(),
+            servicios: (10 + (i % 80)).toString(),
+            estado: i % 14 === 0 ? 'Detenida' : 'Operando',
+            siguienteServicio: estadoMant.servicioTexto,
+            estadoMant: estadoMant
+        });
+    }
+});
+
+let filteredData = []; 
+
+function normalizarTexto(texto) {
+    if (!texto) return "";
+    return texto.toString().toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
 
 function renderTable() {
+    const selectedModule = document.getElementById('module-filter-select').value;
+    const emptyStateDiv = document.getElementById('odometro-empty-state');
+    const tableWrapper = document.getElementById('table-wrapper-container');
+    const paginationWrapper = document.getElementById('pagination-wrapper-container');
+
+    if (!selectedModule) {
+        if (emptyStateDiv) emptyStateDiv.style.display = 'block';
+        if (tableWrapper) tableWrapper.style.display = 'none';
+        if (paginationWrapper) paginationWrapper.style.display = 'none';
+        return;
+    } else {
+        if (emptyStateDiv) emptyStateDiv.style.display = 'none';
+        if (tableWrapper) tableWrapper.style.display = 'block';
+        if (paginationWrapper) paginationWrapper.style.display = 'flex';
+    }
+
     tableBody.innerHTML = '';
     
     const colAcciones = document.getElementById('col-acciones');
     const thAcciones = document.getElementById('th-acciones');
+    const thFilterAcciones = document.getElementById('th-filter-acciones');
     if (colAcciones) colAcciones.style.display = isEditingMode ? 'table-column' : 'none';
     if (thAcciones) thAcciones.style.display = isEditingMode ? 'table-cell' : 'none';
+    if (thFilterAcciones) thFilterAcciones.style.display = isEditingMode ? 'table-cell' : 'none';
 
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     const paginatedData = filteredData.slice(startIndex, endIndex);
 
-    paginatedData.forEach((row) => {
+    if (paginatedData.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="14" style="width: 100%; padding: 0; border: none; background: transparent;">
+                    <div style="width: 100%; min-width: 1150px; height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; box-sizing: border-box;">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;">🔍</div>
+                        <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-light);">No se encontraron registros con los filtros actuales.</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 5px;">Intente modificar los términos de búsqueda o limpiar los filtros.</div>
+                    </div>
+                </td>
+            </tr>`;
+        renderPagination();
+        return;
+    }
+
+    paginatedData.forEach((row, index) => {
         const tr = document.createElement('tr');
-        
-        let actionCell = '';
-        if (isEditingMode) {
-            actionCell = `<td style="text-align: center;"><button class="btn-delete-row" onclick="deleteRow(${row.id})" title="Eliminar Fila">🗑️</button></td>`;
-        }
+        const colorClass = row.estadoMant.color; 
+        tr.className = `row-semaforo-${colorClass}`;
 
-        // 🟢 Celdas que solo se renderizan en HTML si el rol es Admin
-        let adminColAlta = isAdmin ? `<td><input type="date" class="excel-input" value="${row.fecha_alta}" ${!isEditingMode ? 'readonly' : ''} onchange="updateData(${row.id}, 'fecha_alta', this.value)"></td>` : '';
+        const numeroConteo = startIndex + index + 1;
+
+        let actionCell = isEditingMode ? `<td style="text-align: center;"><button class="btn-delete-row" onclick="deleteRow(${row.id})" title="Eliminar Fila">🗑️</button></td>` : '';
         let adminColServ = isAdmin ? `<td><input type="number" class="excel-input" value="${row.servicios}" ${!isEditingMode ? 'readonly' : ''} onchange="updateData(${row.id}, 'servicios', this.value)"></td>` : '';
-
-        const cellsHtml = `
-            <td><input type="text" class="excel-input" value="${row.modulo}" ${!isEditingMode ? 'readonly' : ''} onchange="updateData(${row.id}, 'modulo', this.value)"></td>
+        
+let actionOrdenCell = `<td style="text-align: center;"><a href="/orden-reparacion?economico=${row.economico}&modulo=${row.modulo}&servicio=${encodeURIComponent(row.siguienteServicio)}&modelo=${encodeURIComponent(row.modelo)}&color=${row.estadoMant.color}" class="btn-action-orden" title="Generar Orden para ${row.siguienteServicio}">📄</a></td>`;
+        tr.innerHTML = `
+            <td style="text-align: center; font-weight: bold; font-size: 0.8rem; color: var(--text-muted);">${numeroConteo}</td>
             <td><input type="text" class="excel-input" value="${row.economico}" ${!isEditingMode ? 'readonly' : ''} onchange="updateData(${row.id}, 'economico', this.value)"></td>
-            ${adminColAlta}
+            <td><input type="text" class="excel-input" value="${row.modelo}" ${!isEditingMode ? 'readonly' : ''} onchange="updateData(${row.id}, 'modelo', this.value)" style="font-size: 0.75rem; text-align: left; padding-left: 6px;"></td>
             <td><input type="date" class="excel-input" value="${row.fechaActual}" ${!isEditingMode ? 'readonly' : ''} onchange="updateData(${row.id}, 'fechaActual', this.value)"></td>
             <td><input type="number" step="0.1" class="excel-input" value="${row.kmActual}" ${!isEditingMode ? 'readonly' : ''} onchange="updateData(${row.id}, 'kmActual', this.value)"></td>
             <td><input type="date" class="excel-input" value="${row.fechaMant}" ${!isEditingMode ? 'readonly' : ''} onchange="updateData(${row.id}, 'fechaMant', this.value)"></td>
             <td><input type="number" step="0.1" class="excel-input" value="${row.kmMant}" ${!isEditingMode ? 'readonly' : ''} onchange="updateData(${row.id}, 'kmMant', this.value)"></td>
-            <td><input type="number" step="0.1" class="excel-input" value="${row.kmAcum}" readonly></td>
+            <td><input type="number" step="0.1" class="excel-input" value="${row.kmAcum}" ${!isEditingMode ? 'readonly' : ''} onchange="updateData(${row.id}, 'kmAcum', this.value)" title="Próx. Meta: ${row.estadoMant.metaKm} Km"></td>
+            
+            <td style="text-align: center; vertical-align: middle;">
+                <span class="semaforo-badge-cell ${colorClass}">● ${row.estadoMant.texto}</span>
+            </td>
+
             <td><input type="text" class="excel-input" value="${row.dias}" readonly></td>
-            <td><input type="text" class="excel-input" value="${row.orden}" ${!isEditingMode ? 'readonly' : ''} onchange="updateData(${row.id}, 'orden', this.value)"></td>
             ${adminColServ}
             <td>
                 <select class="excel-input ${row.estado === 'Detenida' ? 'status-detenida' : 'status-operando'}" ${!isEditingMode ? 'disabled' : ''} onchange="updateData(${row.id}, 'estado', this.value); updateStatusColor(this);">
@@ -106,23 +264,20 @@ function renderTable() {
                     <option value="Detenida" ${row.estado === 'Detenida' ? 'selected' : ''}>Detenida</option>
                 </select>
             </td>
+            ${actionOrdenCell}
             ${actionCell}
         `;
-        
-        tr.innerHTML = cellsHtml;
         tableBody.appendChild(tr);
     });
     
     setupKeyboardNavigation();
     renderPagination();
-    setTimeout(adjustStickyHeaders, 50);
 }
 
 function renderPagination() {
     const container = document.getElementById('pagination-controls');
     container.innerHTML = '';
-    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-    if (totalPages <= 1) return; 
+    const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
 
     for (let i = 1; i <= totalPages; i++) {
         const btn = document.createElement('button');
@@ -139,22 +294,31 @@ function renderPagination() {
 
 function updateData(id, key, value) {
     const item = data.find(d => d.id === id);
-    if (item) item[key] = value;
+    if (item) {
+        item[key] = value;
+        if (key === 'kmAcum' || key === 'modelo') {
+            item.estadoMant = calcularSemaforoMantenimiento(parseFloat(item.kmAcum) || 0, item.modelo);
+            item.siguienteServicio = item.estadoMant.servicioTexto;
+        }
+    }
 }
 
 function toggleEditMode() {
-    if (!isAdmin) return; 
+    if (!isAdmin) {
+        alert("Acceso denegado: Se requieren privilegios de Administrador.");
+        return; 
+    }
     isEditingMode = !isEditingMode;
     const btn = document.getElementById('btn-toggle-edit');
     const tools = document.getElementById('admin-tools');
     
     if (isEditingMode) {
         btn.className = 'btn-toggle-mode editable';
-        btn.innerHTML = '✏️ Consulta';
+        btn.innerHTML = '✏️ Modo Edición';
         tools.style.display = 'flex'; 
     } else {
         btn.className = 'btn-toggle-mode readonly';
-        btn.innerHTML = '👁️ Editar';
+        btn.innerHTML = '👁️ Modo Consulta';
         tools.style.display = 'none'; 
     }
     renderTable();
@@ -166,8 +330,13 @@ function updateStatusColor(selectElement) {
 
 function addNewRow() {
     if (!isEditingMode) return;
+    const selMod = document.getElementById('module-filter-select').value || '01';
     const newId = Date.now();
-    const newRow = { id: newId, modulo: '', economico: '', fecha_alta: '', fechaActual: '', kmActual: '', fechaMant: '', kmMant: '', kmAcum: '', dias: '', orden: '', servicios: '', estado: 'Operando' };
+    const modeloDefault = "Volvo Caio Access 2020";
+    const estadoMant = calcularSemaforoMantenimiento(0, modeloDefault);
+    const newRow = { 
+        id: newId, modulo: selMod, economico: '', modelo: modeloDefault, fecha_alta: '2026-01-01', fechaActual: '', kmActual: '', fechaMant: '', kmMant: '', kmAcum: '0', dias: '', orden: '10000', servicios: '', estado: 'Operando', siguienteServicio: estadoMant.servicioTexto, estadoMant: estadoMant 
+    };
     data.unshift(newRow);
     filterTable(); 
 }
@@ -179,11 +348,50 @@ function deleteRow(id) {
 }
 
 function filterTable() {
-    const query = document.getElementById("search-input").value.toLowerCase();
-    filteredData = data.filter(row => {
-        const rowText = Object.values(row).join(' ').toLowerCase();
-        return rowText.includes(query);
+    const selectedModule = document.getElementById('module-filter-select').value;
+    const globalQuery = normalizarTexto(document.getElementById("search-input").value);
+    
+    const columnFilters = {};
+    document.querySelectorAll('.column-filter').forEach(input => {
+        const col = input.getAttribute('data-col');
+        const val = normalizarTexto(input.value.trim());
+        if (val) columnFilters[col] = val;
     });
+
+    if (selectedModule) {
+        localStorage.setItem('rtp_selected_modulo', selectedModule);
+    } else {
+        localStorage.removeItem('rtp_selected_modulo');
+    }
+
+    if (!selectedModule) {
+        filteredData = [];
+        renderTable();
+        return;
+    }
+
+    filteredData = data.filter(row => {
+        const matchesModule = row.modulo === selectedModule;
+        const rowText = normalizarTexto(Object.values(row).join(' '));
+        const matchesGlobal = rowText.includes(globalQuery);
+
+        let matchesColumns = true;
+        for (const col in columnFilters) {
+            let cellValue = "";
+            if (col === 'siguienteServicio') {
+                cellValue = normalizarTexto(row.estadoMant.texto);
+            } else {
+                cellValue = normalizarTexto(row[col]);
+            }
+            if (!cellValue.includes(columnFilters[col])) {
+                matchesColumns = false;
+                break;
+            }
+        }
+
+        return matchesModule && matchesGlobal && matchesColumns;
+    });
+
     currentPage = 1; 
     renderTable();
 }
@@ -192,6 +400,17 @@ let sortAsc = false;
 function sortTable(key) {
     sortAsc = !sortAsc;
     filteredData.sort((a, b) => {
+        if (key === 'siguienteServicio') {
+            const priA = a.estadoMant.prioridad;
+            const priB = b.estadoMant.prioridad;
+            if (priA !== priB) {
+                return sortAsc ? priA - priB : priB - priA;
+            }
+            const lenA = a.estadoMant.numLetras;
+            const lenB = b.estadoMant.numLetras;
+            return sortAsc ? lenB - lenA : lenA - lenB;
+        }
+
         const valA = a[key];
         const valB = b[key];
         const numA = parseFloat(valA);
@@ -252,37 +471,61 @@ function setupKeyboardNavigation() {
 function saveData() { alert("Función de guardado pendiente de conectar a la BD"); }
 
 document.addEventListener('DOMContentLoaded', () => {
-    renderTable();
+    const selectModule = document.getElementById('module-filter-select');
+    
+    if (userAssignedModule && userAssignedModule !== '') {
+        selectModule.value = userAssignedModule;
+        selectModule.disabled = true;
+    } else {
+        const savedModule = localStorage.getItem('rtp_selected_modulo');
+        if (savedModule) {
+            selectModule.value = savedModule;
+        } else {
+            selectModule.value = "";
+        }
+    }
+    
+    filterTable();
 });
 
-
-// ==========================================
-// EXPORTACIÓN A EXCEL Y PDF (CON DATOS FANTASMA INCLUIDOS)
-// ==========================================
 function exportToExcel() {
-    // 🟢 Mapeamos TODOS los datos, incluyendo los que no ve el rol "Consulta"
-    const exportData = filteredData.map(row => ({
+    const selectedModule = document.getElementById('module-filter-select').value;
+    if (!selectedModule) {
+        alert("Por favor, seleccione un Módulo antes de exportar.");
+        return;
+    }
+
+    const exportData = filteredData.map((row, index) => ({
+        "No.": index + 1,
         "Módulo": row.modulo,
         "Económico": row.economico,
-        "Fecha de Alta": row.fecha_alta, // Dato Fantasma incluido
+        "Modelo / Unidad": row.modelo,
+        "Fecha de Alta": row.fecha_alta,
         "Fecha Odómetro": row.fechaActual,
         "Km Odómetro": row.kmActual,
         "Fecha Mantenimiento": row.fechaMant,
         "Km Mantenimiento": row.kmMant,
         "Km Acumulado": row.kmAcum,
+        "Servicio Requerido": row.siguienteServicio,
         "Días Transcurridos": row.dias,
-        "Orden de Mantenimiento": row.orden,
-        "Servicios Efectuados": row.servicios, // Dato Fantasma incluido
+        "Orden": row.orden,
+        "Servicios Efectuados": row.servicios,
         "Estado": row.estado
     }));
     
     const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Odómetro");
-    XLSX.writeFile(wb, "Reporte_Odometro_RTP.xlsx");
+    XLSX.writeFile(wb, `Reporte_Odometro_Modulo_${selectedModule}.xlsx`);
 }
 
 function exportToPDF() {
+    const selectedModule = document.getElementById('module-filter-select').value;
+    if (!selectedModule) {
+        alert("Por favor, seleccione un Módulo antes de imprimir.");
+        return;
+    }
+
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('landscape'); 
 
@@ -296,11 +539,9 @@ function exportToPDF() {
         const pageWidth = doc.internal.pageSize.getWidth();
         
         if (logoImg) {
-            // 🟢 Proporción rectangular ajustada (35x15)
             doc.addImage(logoImg, 'PNG', 14, 10, 35, 20); 
         }
         
-        // 🟢 Textos Centrados
         doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(0, 147, 69);
@@ -309,35 +550,32 @@ function exportToPDF() {
         doc.setFontSize(12);
         doc.setTextColor(50, 50, 50);
         doc.text("SISTEMA DE MANTENIMIENTO", pageWidth / 2, 22, { align: "center" });
-        doc.text("MÓDULO: 04", pageWidth / 2, 28, { align: "center" });
+        doc.text("MÓDULO: " + selectedModule, pageWidth / 2, 28, { align: "center" });
         
-        // 🟢 Fecha a la derecha
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         const fechaStr = new Date().toLocaleString('es-MX', options).toUpperCase();
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10);
         doc.text(fechaStr + " HRS", pageWidth - 14, 34, { align: "right" });
 
-        // 🟢 Mapeamos TODO, incluyendo los datos fantasma
-        const bodyData = filteredData.map(row => [
-            row.modulo, row.economico, row.fecha_alta, row.fechaActual, row.kmActual, row.fechaMant, 
-            row.kmMant, row.kmAcum, row.dias, row.orden, row.servicios, row.estado
+        const bodyData = filteredData.map((row, index) => [
+            (index + 1).toString(), row.modulo, row.economico, row.modelo, row.fecha_alta, row.fechaActual, row.kmActual, row.fechaMant, 
+            row.kmMant, row.kmAcum, row.siguienteServicio, row.dias, row.orden, row.servicios, row.estado
         ]);
 
         doc.autoTable({
             startY: 40,
             head: [
-                [{content: 'Mód.', rowSpan: 2}, {content: 'Econ.', rowSpan: 2}, {content: 'Fecha Alta', rowSpan: 2}, {content: 'Odómetro Actual', colSpan: 2}, {content: 'Último Mantenimiento', colSpan: 2}, {content: 'Km Acum.', rowSpan: 2}, {content: 'Días', rowSpan: 2}, {content: 'Orden', rowSpan: 2}, {content: 'Servicios', rowSpan: 2}, {content: 'Estado', rowSpan: 2}],
+                [{content: '#', rowSpan: 2}, {content: 'Mód.', rowSpan: 2}, {content: 'Econ.', rowSpan: 2}, {content: 'Modelo / Unidad', rowSpan: 2}, {content: 'Fecha Alta', rowSpan: 2}, {content: 'Odómetro Actual', colSpan: 2}, {content: 'Último Mantenimiento', colSpan: 2}, {content: 'Km Acum.', rowSpan: 2}, {content: 'Servicio', rowSpan: 2}, {content: 'Días', rowSpan: 2}, {content: 'Orden', rowSpan: 2}, {content: 'Servicios', rowSpan: 2}, {content: 'Estado', rowSpan: 2}],
                 ['Fecha', 'Km', 'Fecha', 'Km']
             ],
             body: bodyData,
             theme: 'grid',
             headStyles: { fillColor: [0, 147, 69], textColor: [255, 255, 255], halign: 'center' },
-            bodyStyles: { fontSize: 7, halign: 'center' }, // Letra un pelín más chica para que quepan las 12 columnas perfectas
+            bodyStyles: { fontSize: 7, halign: 'center' },
             alternateRowStyles: { fillColor: [245, 245, 245] }
         });
 
-        // 🟢 MAGIA: Abre en nueva pestaña sin descargar automáticamente
         const blob = doc.output('blob');
         const url = URL.createObjectURL(blob);
         window.open(url, '_blank');

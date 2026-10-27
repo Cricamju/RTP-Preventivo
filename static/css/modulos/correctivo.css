@@ -3,120 +3,103 @@
    ========================================= */
 main.content-area { padding: 0 !important; display: block !important; }
 
-/* 🟢 TOPBAR GLASSMORPHISM */
 .correctivo-sticky-header {
     position: sticky; top: 85px; z-index: 100; width: 100%;
     background: rgba(20, 25, 20, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     padding: 12px 40px; border-bottom: 2px solid var(--rtp-green); box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-.header-content-inline { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+.header-content-inline { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
 .inline-title h2 { margin: 0; color: var(--rtp-green); font-size: 1.4rem; white-space: nowrap; }
 
-.inline-search { flex: 1; max-width: 600px; display: flex; gap: 10px; }
-#input-consecutivo {
-    flex: 1; padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(0, 0, 0, 0.5); color: var(--text-light); outline: none; transition: border 0.3s;
-    font-size: 1.1rem; text-align: center; font-weight: bold; letter-spacing: 2px;
+.btn-volver-capsule {
+    display: inline-flex; align-items: center; background: rgba(0, 147, 69, 0.15);
+    border: 1.5px solid var(--rtp-green); border-radius: 12px; padding: 6px 16px;
+    color: var(--rtp-green); font-weight: 800; font-size: 0.9rem; text-decoration: none;
+    box-shadow: 0 4px 15px rgba(0, 147, 69, 0.2); transition: all 0.3s ease;
 }
-#input-consecutivo:focus { border-color: var(--rtp-green); background: rgba(0, 0, 0, 0.8); }
+.btn-volver-capsule:hover { background: var(--rtp-green); color: #ffffff; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 147, 69, 0.4); }
 
-.btn-search { background-color: var(--rtp-green); color: white; border: none; border-radius: 8px; padding: 0 20px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
-.btn-search:hover { background-color: #007a33; }
-
-.btn-export.pdf { background-color: #dc2626; border: none; border-radius: 8px; padding: 10px 20px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; color: white; }
-.btn-export.pdf:hover:not(:disabled) { background-color: #b91c1c; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(220,38,38,0.3); }
-.btn-export.pdf:disabled { background-color: #555; color: #888; cursor: not-allowed; }
-
-/* =========================================
-   🟢 CONTENEDOR PRINCIPAL (MÁS DELGADO Y UX)
-   ========================================= */
-.correctivo-card {
-    width: fit-content; /* 🟢 Hace que el box abrace a la hoja A4 */
-    background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border); 
-    border-radius: 20px; /* Bordes suaves en el box */
-    padding: 30px 40px;  /* 🟢 Padding ajustado para que sobresalga lo justo */
-    margin: 30px auto 50px auto; 
+.management-card.correctivo-card {
+    max-width: 1050px; width: 95%; 
+    background: var(--glass-bg); 
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border); border-radius: 16px; 
+    padding: 35px; margin: 30px auto 60px auto; 
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-    display: flex; justify-content: center;
+    display: block; box-sizing: border-box;
+    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-.document-preview-wrapper { display: flex; flex-direction: column; align-items: center; gap: 30px; }
-.empty-state { text-align: center; color: var(--text-muted); padding: 50px 100px; }
-.empty-state .empty-icon { font-size: 4rem; margin-bottom: 20px; opacity: 0.5; }
-.empty-state h3 { font-size: 1.5rem; margin-bottom: 10px; color: var(--text-light); }
+.document-container { width: 100%; color: var(--text-light); box-sizing: border-box; display: block; }
+
+.doc-header {
+    display: flex; align-items: center; gap: 20px;
+    border-bottom: 2px solid var(--rtp-green); padding-bottom: 20px; margin-bottom: 25px; width: 100%;
+}
+.doc-title-box h2 { margin: 0; font-size: 1.25rem; color: var(--rtp-green); font-weight: 800; }
+.doc-title-box h3 { margin: 4px 0; font-size: 0.95rem; color: var(--text-light); opacity: 0.85; }
+.badge-modulo {
+    display: inline-block; background: rgba(0, 147, 69, 0.2); color: var(--rtp-green);
+    padding: 3px 10px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; margin-top: 5px;
+}
+
+.doc-section { margin-bottom: 30px; width: 100%; box-sizing: border-box; }
+.section-title { font-size: 0.9rem; font-weight: 700; color: var(--rtp-green); margin-bottom: 10px; letter-spacing: 0.5px; }
+.section-title.green-bg { background: var(--rtp-green); color: white; padding: 8px 15px; border-radius: 8px; font-size: 0.95rem; }
+
+.table-responsive { width: 100%; overflow-x: auto; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.15); box-sizing: border-box; }
+
+.doc-table { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.85rem; }
+.doc-table th { background: rgba(0, 0, 0, 0.4); color: var(--text-light); padding: 12px; border-bottom: 2px solid var(--rtp-green); font-weight: 600; white-space: nowrap; }
+.doc-table td { padding: 12px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-light); white-space: nowrap; }
+
+.form-section { background: rgba(0, 0, 0, 0.2); padding: 25px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); width: 100%; box-sizing: border-box; }
+
+.order-form { display: flex; flex-direction: column; gap: 20px; margin-top: 15px; width: 100%; box-sizing: border-box; }
+
+.form-group { display: flex; align-items: center; gap: 20px; width: 100%; box-sizing: border-box; }
+.form-group label { font-weight: 700; width: 180px; min-width: 180px; color: var(--text-light); font-size: 0.9rem; }
+
+.custom-select-input, .custom-date-input {
+    flex: 1; width: 100%; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-light); padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; outline: none; box-sizing: border-box; transition: all 0.3s;
+    color-scheme: dark; /* 🟢 Adapta el icono del calendario a oscuro */
+}
+.custom-select-input:focus, .custom-date-input:focus { border-color: var(--rtp-green); box-shadow: 0 0 0 2px rgba(0, 147, 69, 0.3); }
+.custom-select-input option { background: #1f2937; color: #ffffff; }
+
+.form-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 10px; width: 100%; box-sizing: border-box; }
+.btn-action-cancel {
+    background-color: #dc2626; color: white; padding: 10px 20px; border-radius: 8px;
+    text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; display: inline-block; text-align: center;
+}
+.btn-action-cancel:hover { background-color: #b91c1c; transform: translateY(-2px); }
+
+.btn-action-save {
+    background-color: #16a34a; color: white; border: none; padding: 10px 25px;
+    border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+}
+.btn-action-save:hover { background-color: #15803d; transform: translateY(-2px); }
 
 /* =========================================
-   🟢 LA MAGIA DEL TEMPLATE OVERLAY Y BORDES
+   ☀️ ADAPTACIÓN AL MODO CLARO (light-theme)
    ========================================= */
-.document-a4 {
-    position: relative; 
-    width: 21.59cm; 
-    height: 27.94cm; /* Tamaño Carta exacto */
-    background: white; 
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-    border-radius: 12px; /* 🟢 Bordes redondeados en los documentos (UX) */
-    overflow: hidden; 
+body.light-theme .correctivo-sticky-header { background: rgba(250, 250, 250, 0.92); border-bottom-color: var(--rtp-green); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); }
+body.light-theme .management-card.correctivo-card { background: rgba(255, 255, 255, 0.95); border-color: rgba(0, 147, 69, 0.2); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); color: #111827; }
+body.light-theme .document-container { color: #111827; }
+body.light-theme .doc-title-box h3 { color: #374151; }
+body.light-theme .table-responsive { border-color: #e5e7eb; background: #f9fafb; }
+body.light-theme .doc-table th { background: #f3f4f6; color: #1f2937; }
+body.light-theme .doc-table td { border-bottom-color: #e5e7eb; color: #111827; }
+body.light-theme .form-section { background: #f3f4f6; border-color: #e5e7eb; }
+body.light-theme .form-group label { color: #1f2937; }
+body.light-theme .custom-select-input, 
+body.light-theme .custom-date-input { 
+    background: #ffffff; 
+    border-color: #d1d5db; 
+    color: #111827; 
+    color-scheme: light; /* 🟢 Adapta el icono del calendario a claro */
 }
-
-.template-bg {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    z-index: 1; object-fit: fill;
-}
-
-.floating-data {
-    position: absolute;
-    z-index: 2; /* Encima de la imagen */
-    font-family: 'Arial', sans-serif;
-    font-size: 10pt;
-    color: black;
-    font-weight: bold;
-    /* ⚠️ MANTÉN ESTE BORDE ROJO HASTA QUE QUEDE PERFECTO: */
-    border: 1px solid rgba(220, 38, 38, 0.6); 
-    display: flex; align-items: center; /* Centra el texto verticalmente */
-}
-
-/* =========================================
-   ⚠️ AJUSTE DE COORDENADAS RECALIBRADAS ⚠️
-   ========================================= */
-/* Hoja 1 */
-.pos-fecha { top: 7.3%; left: 68%; width: 22%; height: 2.5%; justify-content: center;}
-.pos-folio { top: 13.5%; left: 68%; width: 15%; height: 2.5%; justify-content: center; }
-.pos-consecutivo { top: 10%; left: 85%; width: 12%; height: 2.5%; justify-content: center; font-size: 12pt; }
-
-.pos-eco { top: 26.5%; left: 3%; width: 18%; height: 2.5%; justify-content: center; }
-.pos-ruta { top: 26.5%; left: 21%; width: 20%; height: 2.5%; justify-content: center; }
-.pos-tipo { top: 26.5%; left: 41%; width: 15%; height: 2.5%; justify-content: center; }
-.pos-km { top: 26.5%; left: 56%; width: 15%; height: 2.5%; justify-content: center; }
-
-.pos-falla { top: 32%; left: 3%; width: 94%; height: 4%; justify-content: flex-start; padding-left: 10px; }
-
-/* Hoja 2 (Ajusta esto cuando veas la hoja 2) */
-.pos-operador { top: 15%; left: 5%; width: 25%; justify-content: center; }
-.pos-jefe { top: 15%; left: 35%; width: 25%; justify-content: center; }
-.pos-jud { top: 15%; left: 70%; width: 25%; justify-content: center; }
-
-
-/* =========================================
-   🟢 IMPRESIÓN LIMPIA (Oculta el sistema)
-   ========================================= */
-@media print {
-    body { background: none !important; padding: 0 !important; margin: 0 !important; }
-    
-    .sidebar, header, .correctivo-sticky-header, .empty-state, footer, .toast-container, .fab-container {
-        display: none !important;
-    }
-
-    .correctivo-card { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
-    .document-preview-wrapper { gap: 0; }
-    
-    /* En el papel físico, le quitamos los bordes redondeados para que salga normal */
-    .document-a4 { box-shadow: none !important; border-radius: 0 !important; page-break-after: always; }
-    
-    .floating-data { border: none !important; } /* Al imprimir se quita el borde rojo automáticamente */
-}
-
-body.light-theme .correctivo-sticky-header { background: rgba(250, 250, 250, 0.9); border-bottom-color: var(--rtp-green); }
-body.light-theme .correctivo-card { background: rgba(255, 255, 255, 0.95); border-color: rgba(0, 147, 69, 0.2); }
-body.light-theme #input-consecutivo { background: #ffffff; border-color: #e5e7eb; color: #111827; }
+body.light-theme .custom-select-input option { background: #ffffff; color: #111827; }

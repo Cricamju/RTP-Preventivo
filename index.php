@@ -148,4 +148,11 @@ switch ($requestUri) {
             include __DIR__ . '/views/error/error_public.php';
         }
         break;
+    
+    case '/orden-reparacion':
+        if (!isset($_SESSION['rol'])) { header("Location: /"); exit; }
+        $page_title = "Detalle y Orden de Reparación";
+        $content_view = __DIR__ . "/views/modulos/orden_reparacion.php";
+        include __DIR__ . '/views/base.php';
+        break;
 }
