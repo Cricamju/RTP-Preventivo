@@ -132,4 +132,5 @@ $user_modulo = isset($_SESSION['modulo_usuario']) ? $_SESSION['modulo_usuario'] 
     const userRole = "<?php echo $rol_usuario; ?>";
     const userAssignedModule = "<?php echo $user_modulo; ?>";
 </script>
-<script src="/static/js/modulos/odometro.js?v=29.0"></script>
+<script src="/static/js/modulos/odometro_data.js?v=1.0"></script>
+<script src="/static/js/modulos/odometro.js?v=30.0"></script>

@@ -91,7 +91,7 @@ switch ($requestUri) {
     case '/odometro':
         if (!isset($_SESSION['rol'])) { header("Location: /"); exit; }
         $page_title = "Control de Odómetros";
-        $content_view = __DIR__ . "/views/modulos/odometro.php";
+        $content_view = __DIR__ . "/views/modulos/odometro/odometro.php";
         include __DIR__ . '/views/base.php';
         break;
 
@@ -102,10 +102,18 @@ switch ($requestUri) {
         include __DIR__ . '/views/base.php';
         break;
 
+    case '/ordenes-reparacion':
     case '/correctivo':
         if (!isset($_SESSION['rol'])) { header("Location: /"); exit; }
         $page_title = "Órdenes de Reparación";
-        $content_view = __DIR__ . "/views/modulos/correctivo.php";
+        $content_view = __DIR__ . "/views/modulos/ordenes_reparacion.php";
+        include __DIR__ . '/views/base.php';
+        break;
+
+    case '/plantilla-orden':
+        if (!isset($_SESSION['rol'])) { header("Location: /"); exit; }
+        $page_title = "Plantilla de Orden Oficial";
+        $content_view = __DIR__ . "/views/modulos/plantilla_orden_reparacion.php";
         include __DIR__ . '/views/base.php';
         break;
 
@@ -135,6 +143,13 @@ switch ($requestUri) {
         header("Location: /");
         exit;
         
+    case '/orden-reparacion':
+        if (!isset($_SESSION['rol'])) { header("Location: /"); exit; }
+        $page_title = "Detalle y Orden de Reparación";
+        $content_view = __DIR__ . "/views/modulos/odometro/generar_orden_reparacion.php";
+        include __DIR__ . '/views/base.php';
+        break;
+
     default:
         http_response_code(404);
         $error_codigo = 404;
@@ -148,11 +163,54 @@ switch ($requestUri) {
             include __DIR__ . '/views/error/error_public.php';
         }
         break;
-    
-    case '/orden-reparacion':
+
+        // ... dentro del switch ($requestUri)
+    case '/ordenes-reparacion':
         if (!isset($_SESSION['rol'])) { header("Location: /"); exit; }
-        $page_title = "Detalle y Orden de Reparación";
-        $content_view = __DIR__ . "/views/modulos/orden_reparacion.php";
+        $page_title = "Órdenes de Reparación";
+        $content_view = __DIR__ . "/views/modulos/ordenes_reparacion.php";
         include __DIR__ . '/views/base.php';
         break;
+
+        case '/guardar-orden':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $nuevaOrden = [
+                'economico' => $_POST['economico'] ?? 'N/A',
+                'modulo' => $_POST['modulo'] ?? '03',
+                'modelo' => $_POST['modelo'] ?? 'Unidad RTP',
+                'tipo_servicio' => $_POST['tipo_servicio'] ?? 'A',
+                'fecha_alta' => $_POST['fecha_alta'] ?? date('Y-m-d'),
+                'no_orden' => rand(500, 999),
+                'fecha_odo' => $_POST['fecha_odo'] ?? date('d-m-Y'),
+                'km_odo' => $_POST['km_odo'] ?? '0.0',
+                'fecha_mant' => $_POST['fecha_mant'] ?? 'N/A',
+                'km_mant' => $_POST['km_mant'] ?? '0.0',
+                'km_acum' => $_POST['km_acum'] ?? '0.0',
+                'dias' => $_POST['dias'] ?? '0'
+            ];
+
+            if (!isset($_SESSION['lista_ordenes_reparacion'])) {
+                $_SESSION['lista_ordenes_reparacion'] = [];
+            }
+            array_unshift($_SESSION['lista_ordenes_reparacion'], $nuevaOrden);
+        }
+        header("Location: /ordenes-reparacion");
+        exit;
+
+        case '/eliminar-orden':
+        if (isset($_GET['eco'])) {
+            $ecoAEliminar = $_GET['eco'];
+            if (isset($_SESSION['lista_ordenes_reparacion'])) {
+                $_SESSION['lista_ordenes_reparacion'] = array_filter(
+                    $_SESSION['lista_ordenes_reparacion'], 
+                    function($ord) use ($ecoAEliminar) {
+                        return $ord['economico'] !== $ecoAEliminar;
+                    }
+                );
+                // Reindexar el arreglo para mantener orden limpio
+                $_SESSION['lista_ordenes_reparacion'] = array_values($_SESSION['lista_ordenes_reparacion']);
+            }
+        }
+        header("Location: /ordenes-reparacion");
+        exit;
 }

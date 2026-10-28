@@ -1,10 +1,18 @@
 <?php
-// views/modulos/orden_reparacion.php
+// views/modulos/odometro/generar_orden_reparacion.php
 $economico = $_GET['economico'] ?? 'N/A';
 $modulo = $_GET['modulo'] ?? '03';
 $servicio_sugerido = $_GET['servicio'] ?? 'A'; 
 $modelo_unidad = $_GET['modelo'] ?? 'Volvo Caio Access 2020'; 
 $color_semaforo = $_GET['color'] ?? 'verde'; 
+
+// Recoger los datos reales que vienen desde el odómetro
+$fecha_odo = $_GET['fecha_odo'] ?? date('Y-m-d');
+$km_odo = $_GET['km_odo'] ?? '0.0';
+$fecha_mant = $_GET['fecha_mant'] ?? 'N/A';
+$km_mant = $_GET['km_mant'] ?? '0.0';
+$km_acum = $_GET['km_acum'] ?? '0.0';
+$dias = $_GET['dias'] ?? '0';
 
 // Mapeo exacto de los nombres de tus archivos en assets/pdfs_gsp/
 function obtenerPdfManual($modelo) {
@@ -23,8 +31,7 @@ function obtenerPdfManual($modelo) {
 
 $pdfManual = obtenerPdfManual($modelo_unidad);
 
-// Asignación de colores basada en el parámetro de la tabla
-$colorHex = '#10b981'; // Verde por defecto
+$colorHex = '#10b981'; 
 $bgHex = 'rgba(16, 185, 129, 0.12)';
 
 if ($color_semaforo === 'amarillo') {
@@ -50,11 +57,9 @@ if ($color_semaforo === 'amarillo') {
     </div>
 </div>
 
-<!-- 🟢 Margen superior aumentado a 90px para separarlo holgadamente de la barra superior -->
 <div class="management-card correctivo-card" style="max-width: 900px; margin: 90px auto 60px auto; padding: 25px;">
     <div class="document-container" style="text-align: center;">
         
-        <!-- Encabezado Institucional -->
         <div class="doc-header" style="display: flex; align-items: center; gap: 20px; border-bottom: 2px solid var(--rtp-green); padding-bottom: 15px; margin-bottom: 20px; text-align: left;">
             <div class="doc-logo">
                 <img src="/static/img/logos/logo-rtp.png" alt="RTP" style="width: 80px;">
@@ -71,7 +76,6 @@ if ($color_semaforo === 'amarillo') {
             </div>
         </div>
 
-        <!-- DATOS DE LA UNIDAD -->
         <div class="doc-section" style="margin-bottom: 25px;">
             <div class="section-title" style="font-size: 0.9rem; font-weight: 700; margin-bottom: 10px; color: var(--text-light); text-align: center;">
                 📊 DATOS DE LA UNIDAD SELECCIONADA (ECONÓMICO: <?php echo htmlspecialchars($economico); ?>)
@@ -91,8 +95,8 @@ if ($color_semaforo === 'amarillo') {
                         <tr>
                             <td style="padding: 8px; text-align: center;"><strong><?php echo htmlspecialchars($economico); ?></strong></td>
                             <td style="padding: 8px; text-align: center;"><?php echo htmlspecialchars($modelo_unidad); ?></td>
-                            <td style="padding: 8px; text-align: center;"><?php echo date('d-m-Y'); ?></td>
-                            <td style="padding: 8px; text-align: center;">429,358.4</td>
+                            <td style="padding: 8px; text-align: center;"><?php echo htmlspecialchars($fecha_odo); ?></td>
+                            <td style="padding: 8px; text-align: center;"><?php echo htmlspecialchars($km_odo); ?></td>
                             <td style="padding: 8px; text-align: center;">
                                 <span style="background: <?php echo $bgHex; ?>; color: <?php echo $colorHex; ?>; border: 1px solid <?php echo $colorHex; ?>; padding: 4px 10px; border-radius: 6px; font-weight: bold;">
                                     <?php echo htmlspecialchars($servicio_sugerido); ?>
@@ -104,19 +108,27 @@ if ($color_semaforo === 'amarillo') {
             </div>
         </div>
 
-        <!-- FORMULARIO DE ORDEN -->
         <div class="doc-section form-section" style="background: rgba(0,0,0,0.15); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); text-align: left;">
             
             <div class="section-title green-bg" style="font-weight: 700; margin-bottom: 20px; padding: 10px 15px; background: var(--rtp-green); color: white; border-radius: 8px; text-align: center; font-size: 0.95rem;">
                 📝 DATOS DE LA ORDEN DE REPARACIÓN
             </div>
-            
-            <form action="/correctivo/guardar" method="POST" class="order-form">
+                        
+            <form action="/guardar-orden" method="POST" class="order-form">
+                <!-- Datos esenciales -->
                 <input type="hidden" name="economico" value="<?php echo htmlspecialchars($economico); ?>">
                 <input type="hidden" name="modulo" value="<?php echo htmlspecialchars($modulo); ?>">
                 <input type="hidden" name="tipo_servicio" value="<?php echo htmlspecialchars($servicio_sugerido); ?>">
+                <input type="hidden" name="modelo" value="<?php echo htmlspecialchars($modelo_unidad); ?>">
                 
-                <!-- Tipo de Servicio Fijo con Color Sincronizado -->
+                <!-- Campos dinámicos recibidos desde el odómetro -->
+                <input type="hidden" name="fecha_odo" value="<?php echo htmlspecialchars($fecha_odo); ?>">
+                <input type="hidden" name="km_odo" value="<?php echo htmlspecialchars($km_odo); ?>">
+                <input type="hidden" name="fecha_mant" value="<?php echo htmlspecialchars($fecha_mant); ?>">
+                <input type="hidden" name="km_mant" value="<?php echo htmlspecialchars($km_mant); ?>">
+                <input type="hidden" name="km_acum" value="<?php echo htmlspecialchars($km_acum); ?>">
+                <input type="hidden" name="dias" value="<?php echo htmlspecialchars($dias); ?>">
+                
                 <div class="form-group" style="margin-bottom: 20px;">
                     <label style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.85rem; text-align: center;">TIPO DE SERVICIO (INAMOVIBLE SEGÚN G.S.P.):</label>
                     <div style="max-width: 500px; margin: 0 auto; padding: 15px; background: <?php echo $bgHex; ?>; border: 1.5px solid <?php echo $colorHex; ?>; border-radius: 10px; text-align: center;">
@@ -132,13 +144,11 @@ if ($color_semaforo === 'amarillo') {
                     </div>
                 </div>
 
-                <!-- Fecha de Alta (Restringido a partir de hoy) -->
                 <div class="form-group" style="margin-bottom: 25px; text-align: center;">
                     <label style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.85rem;">FECHA DE ALTA (MÍNIMO HOY):</label>
                     <input type="date" name="fecha_alta" class="custom-date-input" required min="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>" style="width: 100%; max-width: 300px; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: var(--text-light); text-align: center;">
                 </div>
 
-                <!-- Botones de Acción -->
                 <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
                     <a href="/odometro" class="btn-action-cancel" style="padding: 9px 18px; background: #6b7280; color: white; border-radius: 8px; text-decoration: none; font-size: 0.9rem;">Cancelar</a>
                     <button type="submit" class="btn-action-save" style="padding: 9px 18px; background: var(--rtp-green); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">💾 Salvar Orden</button>

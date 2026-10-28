@@ -16,6 +16,8 @@ switch ($requestPath) {
     case '/gsp':
         $currentModuleCss = '/static/css/modulos/gsp.css';
         break;
+    case '/orden-reparacion':
+    case '/ordenes-reparacion':
     case '/correctivo':
         $currentModuleCss = '/static/css/modulos/correctivo.css';
         break;
@@ -78,10 +80,7 @@ switch ($requestPath) {
                 <a href="/odometro" class="sidebar-link <?= ($requestPath === '/odometro') ? 'active' : '' ?>">
                     <span class="icon">⏱️</span> <span class="text">Captura de Odómetro</span>
                 </a>
-                <a href="/gsp" class="sidebar-link <?= ($requestPath === '/gsp') ? 'active' : '' ?>">
-                    <span class="icon">🛠️</span> <span class="text">Módulo GSP (Preventivo)</span>
-                </a>
-                <a href="/correctivo" class="sidebar-link <?= ($requestPath === '/correctivo') ? 'active' : '' ?>">
+                <a href="/ordenes-reparacion" class="sidebar-link <?= ($requestPath === '/ordenes-reparacion' || $requestPath === '/correctivo') ? 'active' : '' ?>">
                     <span class="icon">📋</span> <span class="text">Órdenes de Reparación</span>
                 </a>
             <?php endif; ?>
@@ -105,7 +104,7 @@ switch ($requestPath) {
             </a>
         </div>
     </nav>
-
+    
     <main class="content-area">
         <?php 
         if (isset($content_view) && file_exists($content_view)) {

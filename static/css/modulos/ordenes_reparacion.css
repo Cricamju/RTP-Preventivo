@@ -1,0 +1,96 @@
+/* static/css/modulos/ordenes_reparacion.css */
+main.content-area { padding: 0 !important; display: block !important; }
+
+.odometro-sticky-header {
+    position: sticky; top: 85px; z-index: 100; width: 100%;
+    background: rgba(20, 25, 20, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    padding: 12px 40px; border-bottom: 2px solid var(--rtp-green); box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.header-content-inline { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+.inline-title h2 { margin: 0; color: var(--rtp-green); font-size: 1.4rem; white-space: nowrap; }
+
+.module-selector-box {
+    display: inline-flex; align-items: center;
+    background: rgba(0, 147, 69, 0.15); border: 1.5px solid var(--rtp-green);
+    border-radius: 12px; padding: 4px 6px 4px 14px; gap: 10px;
+    box-shadow: 0 4px 15px rgba(0, 147, 69, 0.2);
+}
+.module-label { color: var(--rtp-green); font-weight: 800; font-size: 0.85rem; letter-spacing: 1px; white-space: nowrap; }
+
+.module-select-input {
+    background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-light); border-radius: 8px; padding: 6px 12px; font-weight: 700;
+    font-size: 0.9rem; outline: none; cursor: pointer; text-align: center;
+}
+.module-select-input option { background: #1f2937; color: #ffffff; }
+
+.inline-search { flex: 1; max-width: 380px; }
+#search-input {
+    width: 100%; padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.5); color: var(--text-light); outline: none;
+}
+#search-input:focus { border-color: var(--rtp-green); background: rgba(0, 0, 0, 0.8); }
+
+.odometro-card {
+    max-width: 98%; width: 100%; background: var(--glass-bg); backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border); border-radius: 16px; padding: 20px; margin: 20px auto 50px auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.table-wrapper { 
+    border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.15); background: rgba(0, 0, 0, 0.3); 
+    overflow-x: auto; width: 100%; contain: content; 
+}
+
+.excel-table { 
+    width: 100% !important; min-width: 1250px !important; 
+    table-layout: fixed !important; border-collapse: collapse; color: var(--text-light); font-size: 0.85rem; 
+}
+
+.excel-table th {
+    background: #151815; color: var(--text-light); padding: 10px 6px; 
+    font-size: 0.78rem; font-weight: 600; white-space: nowrap; 
+    border: 1px solid rgba(255, 255, 255, 0.15); position: sticky; top: 0; z-index: 40;
+}
+.excel-table thead tr.header-row-2 th { top: 38px; }
+
+.excel-table td { 
+    padding: 8px 6px; position: relative; 
+    border: 1px solid rgba(255, 255, 255, 0.1) !important; 
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.excel-table tbody tr:nth-child(odd) { background-color: rgba(255, 255, 255, 0.02); }
+.excel-table tbody tr:nth-child(even) { background-color: rgba(0, 0, 0, 0.2); }
+.excel-table tbody tr:hover { background-color: rgba(0, 147, 69, 0.12) !important; }
+
+.btn-action-icon {
+    background: rgba(0, 147, 69, 0.15); border: 1px solid var(--rtp-green); color: var(--rtp-green);
+    padding: 4px 8px; border-radius: 6px; text-decoration: none; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; display: inline-block;
+}
+.btn-action-icon:hover { background: var(--rtp-green); color: white; transform: scale(1.05); }
+.btn-action-icon.delete { background: rgba(239, 68, 68, 0.15); border-color: #ef4444; color: #ef4444; }
+.btn-action-icon.delete:hover { background: #ef4444; color: white; }
+
+.semaforo-badge-cell {
+    display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-align: center;
+}
+.semaforo-badge-cell.verde { background-color: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+/* ==========================================
+   MODO CLARO
+   ========================================== */
+body.light-theme .odometro-sticky-header { background: rgba(250, 250, 250, 0.92); border-bottom-color: var(--rtp-green); }
+body.light-theme .module-selector-box { background: rgba(0, 147, 69, 0.08); border-color: var(--rtp-green); }
+body.light-theme .module-select-input { background: #ffffff; border-color: #d1d5db; color: #111827; }
+body.light-theme #search-input { background: #ffffff; border-color: #d1d5db; color: #111827; }
+body.light-theme .odometro-card { background: rgba(255, 255, 255, 0.95); border-color: rgba(0, 147, 69, 0.2); }
+body.light-theme .table-wrapper { background: #ffffff; border-color: #e5e7eb; }
+body.light-theme .excel-table { color: #111827; }
+body.light-theme .excel-table th { background: #f3f4f6; color: #1f2937; border-color: #d1d5db; }
+body.light-theme .excel-table td { border-color: #e5e7eb !important; }
+body.light-theme .excel-table tbody tr:nth-child(odd) { background-color: #ffffff !important; }
+body.light-theme .excel-table tbody tr:nth-child(even) { background-color: #f8fafc !important; }
+body.light-theme .excel-table tbody tr:hover { background-color: rgba(0, 147, 69, 0.08) !important; }

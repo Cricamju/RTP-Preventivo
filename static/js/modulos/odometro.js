@@ -7,15 +7,22 @@ let isEditingMode = false;
 let currentPage = 1;
 const rowsPerPage = 100; 
 
-const modelosFlota = [
-    "Volvo Caio Access 2020",
-    "Yutong ZK6990HGQ 2023",
-    "Dina Linner 2017",
-    "Volvo Procity 2016",
-    "Volvo Torino 2020",
-    "Mercedes Benz Cosmopolitan 2016",
-    "Volvo Articulado Metrobús"
-];
+// Obtener órdenes activas guardadas en el navegador para excluirlas del odómetro
+function obtenerUnidadesEnReparacion() {
+    try {
+        return JSON.parse(localStorage.getItem('rtp_unidades_en_reparacion')) || [];
+    } catch(e) {
+        return [];
+    }
+}
+
+function marcarUnidadEnReparacion(economico) {
+    let enReparacion = obtenerUnidadesEnReparacion();
+    if (!enReparacion.includes(economico)) {
+        enReparacion.push(economico);
+        localStorage.setItem('rtp_unidades_en_reparacion', JSON.stringify(enReparacion));
+    }
+}
 
 // Obtener el intervalo base y reglas según el modelo de autobús
 function obtenerIntervaloBaseYModelo(modelo) {
@@ -25,7 +32,7 @@ function obtenerIntervaloBaseYModelo(modelo) {
     if (m.includes('dina')) return { intervalo: 15000, tipo: 'dina' };
     if (m.includes('masa')) return { intervalo: 12000, tipo: 'masa' };
     if (m.includes('cosmopolitan')) return { intervalo: 10000, tipo: 'cosmopolitan' };
-    return { intervalo: 5000, tipo: 'volvo_sencillo' }; // Volvo Torino, Caio Access, Procity, Articulados
+    return { intervalo: 5000, tipo: 'volvo_sencillo' };
 }
 
 function obtenerCombinacionServicios(kmAcum, modelo) {
@@ -33,7 +40,7 @@ function obtenerCombinacionServicios(kmAcum, modelo) {
     const { intervalo, tipo } = obtenerIntervaloBaseYModelo(modelo);
     
     if (tipo === 'yutong' || tipo === 'dina') {
-        const ciclo = k % 480000; // Ciclo máximo de referencia del manual
+        const ciclo = k % 480000;
         if (ciclo === 0 && k > 0) return { letras: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'], proximoKm: k };
         let letras = [];
         if (k % 15000 === 0) letras.push('A');
@@ -45,7 +52,6 @@ function obtenerCombinacionServicios(kmAcum, modelo) {
         if (k % 240000 === 0) letras.push('G');
         if (k % 480000 === 0) letras.push('H');
         if (letras.length === 0) {
-            // Si cae en un rango intermedio, determinamos el servicio base más cercano
             const resto = k % 15000;
             letras.push(resto < 7500 ? 'A' : 'B');
         }
@@ -75,7 +81,6 @@ function obtenerCombinacionServicios(kmAcum, modelo) {
         if (letras.length === 0) letras.push('A');
         return { letras: letras, proximoKm: Math.ceil(k / 10000) * 10000 || 10000 };
     } else {
-        // Volvo Sencillos / Articulados (Base 5000 km)[cite: 20, 48]
         let letras = [];
         if (k % 5000 === 0) letras.push('A');
         if (k % 15000 === 0) letras.push('B');
@@ -129,52 +134,11 @@ function calcularSemaforoMantenimiento(kmAcum, modelo) {
     };
 }
 
-let data = [];
-const modulosList = ['01', '02', '03', '04', '05', '06', '07'];
-
-let globalId = 1;
-modulosList.forEach((mod) => {
-    for (let i = 1; i <= 150; i++) {
-        const modeloAsignado = modelosFlota[i % modelosFlota.length];
-        const { intervalo } = obtenerIntervaloBaseYModelo(modeloAsignado);
-        
-        const multiplier = ((i * 7) % 35) + 5; // Genera rangos variados de kilometraje
-        const baseMilestone = intervalo * multiplier;
-
-        let kmAcumSimulado = 0;
-        const statusSelector = i % 5;
-
-        if (statusSelector === 0) {
-            kmAcumSimulado = baseMilestone + ((i * 37) % 2500) + 200; 
-        } else if (statusSelector === 1 || statusSelector === 2) {
-            kmAcumSimulado = baseMilestone - (((i * 23) % 700) + 100); 
-        } else {
-            kmAcumSimulado = baseMilestone - (((i * 59) % 4000) + 1000); 
-        }
-
-        if (kmAcumSimulado < 2000) kmAcumSimulado = 3500;
-
-        const estadoMant = calcularSemaforoMantenimiento(kmAcumSimulado, modeloAsignado);
-
-        data.push({
-            id: globalId++,
-            modulo: mod,
-            economico: (6000 + (parseInt(mod) * 200) + i).toString(),
-            modelo: modeloAsignado,
-            fecha_alta: `200${4 + (i%5)}-0${(i%9)+1}-15`,
-            fechaActual: `2026-08-${(i%28 + 1).toString().padStart(2, '0')}`,
-            kmActual: (kmAcumSimulado + 120.5).toFixed(1),
-            fechaMant: `2026-01-${(i%28 + 1).toString().padStart(2, '0')}`,
-            kmMant: (kmAcumSimulado - 4500).toFixed(1),
-            kmAcum: kmAcumSimulado.toFixed(1),
-            dias: (30 + (i % 90)).toString(),
-            orden: (10000 + i).toString(),
-            servicios: (10 + (i % 80)).toString(),
-            estado: i % 14 === 0 ? 'Detenida' : 'Operando',
-            siguienteServicio: estadoMant.servicioTexto,
-            estadoMant: estadoMant
-        });
-    }
+// Inicializar propiedades de semáforo en los datos importados de odometro_data.js
+data.forEach(item => {
+    const estadoMant = calcularSemaforoMantenimiento(parseFloat(item.kmAcum) || 0, item.modelo);
+    item.estadoMant = estadoMant;
+    item.siguienteServicio = estadoMant.servicioTexto;
 });
 
 let filteredData = []; 
@@ -241,7 +205,9 @@ function renderTable() {
         let actionCell = isEditingMode ? `<td style="text-align: center;"><button class="btn-delete-row" onclick="deleteRow(${row.id})" title="Eliminar Fila">🗑️</button></td>` : '';
         let adminColServ = isAdmin ? `<td><input type="number" class="excel-input" value="${row.servicios}" ${!isEditingMode ? 'readonly' : ''} onchange="updateData(${row.id}, 'servicios', this.value)"></td>` : '';
         
-let actionOrdenCell = `<td style="text-align: center;"><a href="/orden-reparacion?economico=${row.economico}&modulo=${row.modulo}&servicio=${encodeURIComponent(row.siguienteServicio)}&modelo=${encodeURIComponent(row.modelo)}&color=${row.estadoMant.color}" class="btn-action-orden" title="Generar Orden para ${row.siguienteServicio}">📄</a></td>`;
+        // 🟢 MODIFICACIÓN CLAVE: Se añadieron los parámetros de fecha, kilómetros y días en la URL del enlace
+        let actionOrdenCell = `<td style="text-align: center;"><a href="/orden-reparacion?economico=${row.economico}&modulo=${row.modulo}&servicio=${encodeURIComponent(row.siguienteServicio)}&modelo=${encodeURIComponent(row.modelo)}&color=${row.estadoMant.color}&fecha_odo=${encodeURIComponent(row.fechaActual)}&km_odo=${encodeURIComponent(row.kmActual)}&fecha_mant=${encodeURIComponent(row.fechaMant)}&km_mant=${encodeURIComponent(row.kmMant)}&km_acum=${encodeURIComponent(row.kmAcum)}&dias=${encodeURIComponent(row.dias)}" onclick="marcanUnidadYRefrescar('${row.economico}')" class="btn-action-orden" title="Generar Orden para ${row.siguienteServicio}">📄</a></td>`;
+
         tr.innerHTML = `
             <td style="text-align: center; font-weight: bold; font-size: 0.8rem; color: var(--text-muted);">${numeroConteo}</td>
             <td><input type="text" class="excel-input" value="${row.economico}" ${!isEditingMode ? 'readonly' : ''} onchange="updateData(${row.id}, 'economico', this.value)"></td>
@@ -272,6 +238,10 @@ let actionOrdenCell = `<td style="text-align: center;"><a href="/orden-reparacio
     
     setupKeyboardNavigation();
     renderPagination();
+}
+
+function marcanUnidadYRefrescar(economico) {
+    marcanUnidadEnReparacion(economico);
 }
 
 function renderPagination() {
@@ -335,7 +305,7 @@ function addNewRow() {
     const modeloDefault = "Volvo Caio Access 2020";
     const estadoMant = calcularSemaforoMantenimiento(0, modeloDefault);
     const newRow = { 
-        id: newId, modulo: selMod, economico: '', modelo: modeloDefault, fecha_alta: '2026-01-01', fechaActual: '', kmActual: '', fechaMant: '', kmMant: '', kmAcum: '0', dias: '', orden: '10000', servicios: '', estado: 'Operando', siguienteServicio: estadoMant.servicioTexto, estadoMant: estadoMant 
+        id: newId, modulo: selMod, economico: '', modelo: modeloDefault, fecha_alta: '2026-01-01', fechaActual: '', kmActual: '', fechaMant: '', kmMant: '', kmAcum: '0', dias: '', orden: '10000', servicios: '', estado: 'Operando', siguienteServicio: estadoMant.servicioTexto, estadoMant: estadoMant, enReparacion: false 
     };
     data.unshift(newRow);
     filterTable(); 
@@ -350,6 +320,7 @@ function deleteRow(id) {
 function filterTable() {
     const selectedModule = document.getElementById('module-filter-select').value;
     const globalQuery = normalizarTexto(document.getElementById("search-input").value);
+    const unidadesEnReparacion = obtenerUnidadesEnReparacion();
     
     const columnFilters = {};
     document.querySelectorAll('.column-filter').forEach(input => {
@@ -371,6 +342,8 @@ function filterTable() {
     }
 
     filteredData = data.filter(row => {
+        if (unidadesEnReparacion.includes(row.economico)) return false;
+
         const matchesModule = row.modulo === selectedModule;
         const rowText = normalizarTexto(Object.values(row).join(' '));
         const matchesGlobal = rowText.includes(globalQuery);
