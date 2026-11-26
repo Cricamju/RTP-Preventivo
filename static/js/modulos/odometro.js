@@ -550,10 +550,8 @@ function filterTable(resetPage = true) {
         if (val) columnFilters[col] = val;
     });
 
-    if (selectedModule) {
+    if (window.RTP_MODULE_CONTEXT?.canSelectAnyModule && /^0?[1-7]$/.test(selectedModule)) {
         localStorage.setItem('rtp_selected_modulo', selectedModule);
-    } else {
-        localStorage.removeItem('rtp_selected_modulo');
     }
 
     if (!selectedModule) {
@@ -618,19 +616,7 @@ function sortTable(key) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const selectModule = document.getElementById('module-filter-select');
-    
-    if (userAssignedModule && userAssignedModule !== '' && userAssignedModule !== 'central') {
-        selectModule.value = userAssignedModule.padStart(2, '0');
-        selectModule.disabled = true;
-    } else if (userAssignedModule === 'central') {
-        const savedModule = localStorage.getItem('rtp_selected_modulo');
-        if (savedModule) selectModule.value = savedModule;
-    } else {
-        selectModule.value = "";
-        selectModule.disabled = true;
-    }
-    
-    filterTable();
+    if (selectModule) filterTable();
 });
 
 function exportToExcel() {

@@ -1,45 +1,3 @@
-.header-content-inline {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-.inline-title h2 {
-    margin: 0;
-    color: var(--rtp-green, #009345);
-    font-size: 1.3rem;
-    white-space: nowrap;
-}
-
-.module-selector-box {
-    display: inline-flex;
-    align-items: center;
-    background: rgba(0, 147, 69, 0.15);
-    border: 1.5px solid var(--rtp-green, #009345);
-    border-radius: 12px;
-    padding: 4px 6px 4px 14px;
-    gap: 10px;
-}
-
-.module-label {
-    color: var(--rtp-green, #009345);
-    font-weight: 800;
-    font-size: 0.85rem;
-}
-
-.module-select-input {
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--text-light);
-    border-radius: 8px;
-    padding: 6px 12px;
-    font-weight: 700;
-    font-size: 0.9rem;
-    cursor: pointer;
-}
-
 .inline-controls {
     display: flex;
     align-items: center;
@@ -148,7 +106,6 @@
     white-space: nowrap;
 }
 
-body.light-theme .module-select-input,
 body.light-theme .report-filter-field input,
 body.light-theme .report-filter-field select {
     background: #ffffff;
@@ -168,14 +125,6 @@ body.light-theme .report-filter-button:not(.primary) {
 }
 
 @media (max-width: 768px) {
-    .header-content-inline {
-        align-items: stretch;
-    }
-
-    .inline-controls {
-        justify-content: flex-start;
-    }
-
     .report-filter-field,
     .report-economic-filter {
         flex: 1 1 145px;

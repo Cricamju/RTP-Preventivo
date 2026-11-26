@@ -1,10 +1,6 @@
 /* static/css/modulos/odometro.css */
 body.odometro-view {
-    --odometro-toast-offset-y: 12px;
-}
-
-.toast-container, #toast-container {
-    top: 130px;
+    --odometro-toast-offset-y: 16px;
 }
 
 body.odometro-view .toast-container {
@@ -41,29 +37,12 @@ body.light-theme.odometro-view .toast-box {
     transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-.header-content-inline { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
-.inline-title h2 { margin: 0; color: var(--rtp-green, #009345); font-size: 1.4rem; white-space: nowrap; }
-
-.module-selector-box {
-    display: inline-flex; align-items: center;
-    background: rgba(0, 147, 69, 0.15); border: 1.5px solid var(--rtp-green, #009345);
-    border-radius: 12px; padding: 4px 6px 4px 14px; gap: 10px;
-}
-.module-label { color: var(--rtp-green, #009345); font-weight: 800; font-size: 0.85rem; }
-.module-select-input {
-    background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--text-light); border-radius: 8px; padding: 6px 12px; font-weight: 700; font-size: 0.9rem; outline: none; cursor: pointer;
-}
-.module-select-input option { background: #1f2937; color: #ffffff; }
-
 .inline-search { flex: 1; max-width: 380px; }
 #search-input {
     width: 100%; padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2);
     background: rgba(0, 0, 0, 0.5); color: var(--text-light); outline: none;
 }
 #search-input:focus { border-color: var(--rtp-green, #009345); background: rgba(0, 0, 0, 0.8); }
-
-.inline-controls { display: flex; align-items: center; gap: 15px; }
 
 .btn-export { border: none; border-radius: 8px; padding: 8px 16px; font-weight: 600; cursor: pointer; font-size: 0.9rem; color: white; }
 .btn-export.excel { background-color: #16a34a; }
@@ -200,7 +179,6 @@ body.light-theme .odometro-sticky-header {
     border-bottom-color: var(--rtp-green, #009345) !important;
 }
 
-body.light-theme .module-select-input, 
 body.light-theme #search-input { 
     background: #ffffff !important; 
     color: #0f172a !important; 

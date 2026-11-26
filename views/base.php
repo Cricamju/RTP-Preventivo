@@ -1,5 +1,6 @@
 <?php
 // views/base.php
+require_once __DIR__ . '/../helpers/module_access.php';
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -34,10 +35,6 @@ switch ($requestPath) {
     case '/orden-reparacion':
         $currentModuleCss = '/static/css/modulos/generar_orden_reparacion.css';
         break;
-    case '/ordenes-reparacion':
-    case '/correctivo':
-        $currentModuleCss = '/static/css/modulos/ordenes_reparacion.css';
-        break;
     case '/gestion-usuarios':
         $currentModuleCss = '/static/css/modulos/gestion_usuarios.css';
         break;
@@ -69,9 +66,14 @@ $isReportesRoute = str_starts_with($requestPath, '/reportes');
     <link rel="stylesheet" href="/static/css/components/accessibility.css">
 
     <?php if (!empty($currentModuleCss)): ?>
-        <link rel="stylesheet" href="<?= $currentModuleCss ?>?v=12.0">
+        <link rel="stylesheet" href="<?= $currentModuleCss ?>?v=14.0">
     <?php endif; ?>
+    <link rel="stylesheet" href="/static/css/components/module-topbar.css?v=1.1">
 
+    <script>
+        window.RTP_MODULE_CONTEXT = <?= json_encode(rtpModuleContext(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+    </script>
+    <script defer src="/static/js/components/module-context.js?v=1.0"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>

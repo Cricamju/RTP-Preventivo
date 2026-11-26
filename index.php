@@ -2,6 +2,8 @@
 // index.php
 session_start();
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/helpers/module_access.php';
+require_once __DIR__ . '/helpers/ordenes_reparacion_store.php';
 
 // Limpieza de caché estricta
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
@@ -111,6 +113,20 @@ switch ($requestUri) {
     case '/ordenes-reparacion':
     case '/correctivo':
         if (!isset($_SESSION['rol'])) { header("Location: /"); exit; }
+        $puede_seleccionar_modulo = rtpCanSelectAnyModule();
+        $modulo_asignado = rtpNormalizeModuleId($_SESSION['modulo_usuario'] ?? '');
+        $moduloActivo = $puede_seleccionar_modulo ? '' : ($modulo_asignado ?? '');
+
+        // El repositorio entrega filas normalizadas; la vista no depende del origen de datos.
+        /** @var list<array{economico: string, modulo: string, modelo: string, tipo_servicio: string, color: string, fecha_alta: string, no_orden: string, fecha_odo: string, km_odo: string, fecha_mant: string, km_mant: string, km_acum: string, dias: string}> $ordenes */
+        $ordenes = rtpListRepairOrders();
+        if (!$puede_seleccionar_modulo) {
+            $ordenes = array_values(array_filter($ordenes, static function ($orden) use ($modulo_asignado) {
+                return $modulo_asignado !== null
+                    && rtpNormalizeModuleId($orden['modulo'] ?? '') === $modulo_asignado;
+            }));
+        }
+
         $page_title = "Órdenes de Reparación";
         $content_view = __DIR__ . "/views/modulos/ordenes_reparacion.php";
         include __DIR__ . '/views/base.php';
@@ -175,6 +191,15 @@ switch ($requestUri) {
         
     case '/orden-reparacion':
         if (!isset($_SESSION['rol'])) { header("Location: /"); exit; }
+        if (!rtpUserCanAccessModule($_GET['modulo'] ?? '')) {
+            http_response_code(403);
+            $error_codigo = 403;
+            $error_mensaje = 'Acceso denegado';
+            $error_descripcion = 'No tienes permiso para consultar órdenes de otro módulo.';
+            $content_view = __DIR__ . '/views/error/error_private.php';
+            include __DIR__ . '/views/base.php';
+            break;
+        }
         $page_title = "Detalle y Orden de Reparación";
         $content_view = __DIR__ . "/views/modulos/odometro/generar_orden_reparacion.php";
         include __DIR__ . '/views/base.php';
@@ -185,7 +210,12 @@ switch ($requestUri) {
             require_once __DIR__ . '/helpers/semaforo_helper.php';
             
             $economico = $_POST['economico'] ?? 'N/A';
-            $modulo = $_POST['modulo'] ?? '03';
+            $moduloSolicitado = rtpNormalizeModuleId($_POST['modulo'] ?? '');
+            if ($moduloSolicitado === null || !rtpUserCanAccessModule($moduloSolicitado)) {
+                http_response_code(403);
+                exit('No tienes permiso para guardar órdenes en ese módulo.');
+            }
+            $modulo = $moduloSolicitado;
             $modelo = $_POST['modelo'] ?? 'Volvo Caio Access 2020';
             $km_acum = $_POST['km_acum'] ?? '0.0';
             
@@ -208,23 +238,7 @@ switch ($requestUri) {
                 'dias' => $_POST['dias'] ?? '0'
             ];
 
-            if (!isset($_SESSION['lista_ordenes_reparacion'])) {
-                $_SESSION['lista_ordenes_reparacion'] = [];
-            }
-
-            $encontrado = false;
-            foreach ($_SESSION['lista_ordenes_reparacion'] as $key => $ord) {
-                if ($ord['economico'] === $economico) {
-                    $nuevaOrden['no_orden'] = $ord['no_orden']; 
-                    $_SESSION['lista_ordenes_reparacion'][$key] = $nuevaOrden;
-                    $encontrado = true;
-                    break;
-                }
-            }
-
-            if (!$encontrado) {
-                array_unshift($_SESSION['lista_ordenes_reparacion'], $nuevaOrden);
-            }
+            rtpSaveRepairOrder($nuevaOrden);
         }
         header("Location: /ordenes-reparacion");
         exit;
@@ -232,14 +246,18 @@ switch ($requestUri) {
     case '/eliminar-orden':
         if (isset($_GET['eco'])) {
             $ecoAEliminar = $_GET['eco'];
-            if (isset($_SESSION['lista_ordenes_reparacion'])) {
-                $_SESSION['lista_ordenes_reparacion'] = array_filter(
-                    $_SESSION['lista_ordenes_reparacion'], 
-                    function($ord) use ($ecoAEliminar) {
-                        return $ord['economico'] !== $ecoAEliminar;
-                    }
-                );
-                $_SESSION['lista_ordenes_reparacion'] = array_values($_SESSION['lista_ordenes_reparacion']);
+            $moduloOrdenPermitida = null;
+            foreach (rtpListRepairOrders() as $orden) {
+                if ($orden['economico'] === $ecoAEliminar
+                    && rtpUserCanAccessModule($orden['modulo'] ?? '')) {
+                    $moduloOrdenPermitida = rtpNormalizeModuleId($orden['modulo']);
+                    break;
+                }
+            }
+            if ($moduloOrdenPermitida !== null) {
+                rtpDeleteRepairOrder($ecoAEliminar, $moduloOrdenPermitida);
+            } else {
+                http_response_code(403);
             }
         }
         header("Location: /ordenes-reparacion");

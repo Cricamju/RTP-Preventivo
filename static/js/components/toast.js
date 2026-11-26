@@ -1,28 +1,30 @@
 // static/js/components/toast.js
+function positionToastContainer(container) {
+    if (!container || !document.body.classList.contains('odometro-view')) return false;
+
+    const tableCard = document.querySelector('.odometro-card');
+    const moduleHeader = document.getElementById('sticky-panel');
+    const headerBottom = moduleHeader ? moduleHeader.getBoundingClientRect().bottom : 0;
+    const configuredOffset = parseFloat(
+        getComputedStyle(document.body).getPropertyValue('--odometro-toast-offset-y')
+    );
+    const offset = Number.isFinite(configuredOffset) ? configuredOffset : 32;
+    const cardRect = tableCard?.getBoundingClientRect();
+    const top = Math.max((cardRect?.top ?? headerBottom) + offset, headerBottom + offset);
+
+    container.style.top = `${top}px`;
+    container.style.left = 'auto';
+    container.style.right = `${Math.max(12, window.innerWidth - (cardRect?.right ?? window.innerWidth - 12) + 12)}px`;
+    container.style.width = `${Math.max(0, Math.min(450, (cardRect?.width ?? window.innerWidth) - 24))}px`;
+    container.style.transform = 'none';
+    return true;
+}
+
 function showToast(message, type = 'success', duration = 4500, actions = null, persistent = false) {
     const container = document.getElementById('toast-container');
     if (!container && !persistent) return;
 
-    if (!persistent && document.body.classList.contains('odometro-view')) {
-        const tableCard = document.querySelector('.odometro-card');
-        if (tableCard) {
-            const rect = tableCard.getBoundingClientRect();
-            const toastWidth = Math.max(0, Math.min(450, rect.width - 24));
-            const moduleHeader = document.getElementById('sticky-panel');
-            const headerBottom = moduleHeader ? moduleHeader.getBoundingClientRect().bottom : 0;
-            const configuredOffset = parseFloat(
-                getComputedStyle(document.body).getPropertyValue('--odometro-toast-offset-y')
-            );
-            const offset = Number.isFinite(configuredOffset) ? configuredOffset : 12;
-            const top = Math.max(rect.top + offset, headerBottom + offset);
-            const right = Math.max(12, window.innerWidth - rect.right + 12);
-            container.style.top = `${top}px`;
-            container.style.left = 'auto';
-            container.style.right = `${right}px`;
-            container.style.width = `${toastWidth}px`;
-            container.style.transform = 'none';
-        }
-    }
+    if (!persistent) positionToastContainer(container);
 
     let backdrop = null;
     if (persistent) {
@@ -145,16 +147,16 @@ document.addEventListener('DOMContentLoaded', () => {
         userProfileBtn.addEventListener('click', () => {
             setTimeout(() => {
                 if (userDropdown && userDropdown.classList.contains('show')) {
-                    toastContainer.style.top = '180px';
+                    if (!positionToastContainer(toastContainer)) toastContainer.style.top = '180px';
                 } else {
-                    toastContainer.style.top = '115px';
+                    if (!positionToastContainer(toastContainer)) toastContainer.style.top = '115px';
                 }
             }, 50);
         });
 
         document.addEventListener('click', (e) => {
             if (userDropdown && !userDropdown.contains(e.target) && !userProfileBtn.contains(e.target)) {
-                toastContainer.style.top = '115px';
+                if (!positionToastContainer(toastContainer)) toastContainer.style.top = '115px';
             }
         });
     }

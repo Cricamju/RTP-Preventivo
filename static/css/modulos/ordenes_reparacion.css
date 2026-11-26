@@ -1,166 +1,134 @@
-/* static/css/modulos/ordenes_reparacion.css */
-main.content-area { padding: 0 !important; display: block !important; }
-
-main.content-area:has(.module-state-container > .module-empty-card:not([hidden])) {
-    display: flex !important;
-    flex-direction: column;
+/* Órdenes de reparación usa el layout y la tabla compartidos. */
+.ordenes-module-header {
+    top: auto;
 }
 
-.module-state-container:has(> .module-empty-card:not([hidden])) {
-    display: grid;
-    flex: 1 1 auto;
-    place-items: center;
+.ordenes-module-header .inline-title {
+    flex: 1 1 320px;
+}
+
+.ordenes-module-header .inline-search {
+    flex: 0 1 320px;
+    min-width: min(100%, 220px);
+}
+
+.ordenes-module-header #search-input {
     width: 100%;
-    max-width: none;
-    min-height: 0;
-    margin: 0 auto;
+    padding: 10px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    outline: none;
+    background: rgba(0, 0, 0, 0.5);
+    color: var(--text-light);
 }
 
-.odometro-sticky-header {
-    position: sticky; top: 85px; z-index: 100; width: 100%;
-    background: rgba(20, 25, 20, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    padding: 12px 40px; border-bottom: 2px solid var(--rtp-green); box-shadow: 0 5px 25px rgba(0,0,0,0.5);
-    transition: background 0.3s ease, border-color 0.3s ease;
+.ordenes-module-header #search-input:focus {
+    border-color: var(--rtp-green);
+    background: rgba(0, 0, 0, 0.8);
 }
 
-.header-content-inline { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
-.inline-title h2 { margin: 0; color: var(--rtp-green); font-size: 1.4rem; white-space: nowrap; }
-
-.module-selector-box {
-    display: inline-flex; align-items: center;
-    background: rgba(0, 147, 69, 0.15); border: 1.5px solid var(--rtp-green);
-    border-radius: 12px; padding: 4px 6px 4px 14px; gap: 10px;
-    box-shadow: 0 4px 15px rgba(0, 147, 69, 0.2);
-}
-.module-label { color: var(--rtp-green); font-weight: 800; font-size: 0.85rem; letter-spacing: 1px; white-space: nowrap; }
-
-.module-select-input {
-    background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--text-light); border-radius: 8px; padding: 6px 12px; font-weight: 700;
-    font-size: 0.9rem; outline: none; cursor: pointer; text-align: center;
-}
-.module-select-input option { background: #1f2937; color: #ffffff; }
-
-.inline-search { flex: 1; max-width: 380px; }
-#search-input {
-    width: 100%; padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(0, 0, 0, 0.5); color: var(--text-light); outline: none;
-}
-#search-input:focus { border-color: var(--rtp-green); background: rgba(0, 0, 0, 0.8); }
-
-.odometro-card {
-    position: relative;
-    max-width: 98%; width: 100%; background: var(--glass-bg); backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border); border-radius: 16px; padding: 20px; margin: 20px auto 50px auto;
-    min-height: 360px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+.master-card .btn-action-icon {
+    display: inline-block;
+    padding: 4px 8px;
+    border: 1px solid var(--rtp-green);
+    border-radius: 6px;
+    background: rgba(0, 147, 69, 0.15);
+    color: var(--rtp-green);
+    font-size: 0.95rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
-.table-wrapper { 
-    border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.15); background: rgba(0, 0, 0, 0.3); 
-    overflow-x: hidden; /* 🟢 Oculta cualquier scroll lateral innecesario ya que los contenidos caben perfectamente */
-    overflow-y: visible; width: 100%; 
+.master-card .btn-action-icon:hover {
+    transform: scale(1.05);
+    background: var(--rtp-green);
+    color: #ffffff;
 }
 
-.excel-table { 
-    width: 100% !important; 
-    min-width: 100% !important; /* 🟢 Se elimina el ancho forzado de 1250px que generaba la barra */
-    table-layout: fixed !important; border-collapse: collapse; color: var(--text-light); font-size: 0.85rem; 
+.master-card .btn-action-icon.delete {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
 }
 
-#tabla-ordenes {
-    width: 100% !important;
-    min-width: 100% !important;
+.master-card .btn-action-icon.delete:hover {
+    background: #ef4444;
+    color: #ffffff;
 }
 
-/* 🟢 CAPA SÓLIDA DE ENCABEZADOS CON BOX TRASERO (LAYER) ADAPTABLE */
-.excel-table thead tr.header-row-1,
-.excel-table thead tr.header-row-2 {
-    background-color: #121512 !important;
+.master-table-wrapper #tabla-ordenes {
+    width: max(100%, 1450px) !important;
+    min-width: 1450px !important;
 }
 
-.excel-table th {
-    position: relative;
-    color: var(--text-light); padding: 10px 4px; 
-    font-size: 0.75rem; font-weight: 600; white-space: nowrap; 
-    border: 1px solid rgba(255, 255, 255, 0.18); 
-    background: transparent !important;
-    z-index: 41;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.excel-table th::before {
-    content: '';
-    position: absolute;
-    top: -3px;
-    bottom: -3px;
-    left: -3px;
-    right: -3px;
-    background-color: #121512;
-    z-index: -1;
-}
-
-.excel-table th:hover { color: var(--rtp-green); }
-.excel-table th:hover::before { background-color: #1a1e1a; }
-
-.excel-table td { 
-    padding: 8px 4px; position: relative; 
-    border: 1px solid rgba(255, 255, 255, 0.1) !important; 
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-
-.excel-table tbody tr:nth-child(odd) { background-color: rgba(255, 255, 255, 0.02); }
-.excel-table tbody tr:nth-child(even) { background-color: rgba(0, 0, 0, 0.2); }
-.excel-table tbody tr:hover { background-color: rgba(0, 147, 69, 0.12) !important; }
-
-.btn-action-icon {
-    background: rgba(0, 147, 69, 0.15); border: 1px solid var(--rtp-green); color: var(--rtp-green);
-    padding: 4px 8px; border-radius: 6px; text-decoration: none; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; display: inline-block;
-}
-.btn-action-icon:hover { background: var(--rtp-green); color: white; transform: scale(1.05); }
-.btn-action-icon.delete { background: rgba(239, 68, 68, 0.15); border-color: #ef4444; color: #ef4444; }
-.btn-action-icon.delete:hover { background: #ef4444; color: white; }
-
-/* 🟢 SEMÁFORO DE MANTENIMIENTO */
 .semaforo-badge-cell {
-    display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 700; text-align: center; white-space: nowrap;
+    display: inline-block;
+    max-width: 100%;
+    padding: 4px 8px;
+    overflow: hidden;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
 }
-.semaforo-badge-cell.verde { background-color: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
-.semaforo-badge-cell.amarillo { background-color: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
-.semaforo-badge-cell.rojo { background-color: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); animation: pulse-red 1.5s infinite; }
+
+.semaforo-badge-cell.verde {
+    border-color: rgba(16, 185, 129, 0.3);
+    background-color: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.semaforo-badge-cell.amarillo {
+    border-color: rgba(245, 158, 11, 0.3);
+    background-color: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.semaforo-badge-cell.rojo {
+    border-color: rgba(239, 68, 68, 0.3);
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    animation: pulse-red 1.5s infinite;
+}
 
 @keyframes pulse-red {
-    0% { opacity: 0.8; }
-    50% { opacity: 1; transform: scale(1.02); }
-    100% { opacity: 0.8; }
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
 }
 
-tr.row-semaforo-amarillo { background-color: rgba(245, 158, 11, 0.04); }
-tr.row-semaforo-rojo { background-color: rgba(239, 68, 68, 0.06); }
+tr.row-semaforo-amarillo {
+    background-color: rgba(245, 158, 11, 0.04);
+}
 
-/* ==========================================
-   MODO CLARO
-   ========================================== */
-body.light-theme .odometro-sticky-header { background: rgba(250, 250, 250, 0.95); border-bottom-color: var(--rtp-green); }
-body.light-theme .module-selector-box { background: rgba(0, 147, 69, 0.08); border-color: var(--rtp-green); }
-body.light-theme .module-select-input { background: #ffffff; border-color: #d1d5db; color: #111827; }
-body.light-theme #search-input { background: #ffffff; border-color: #d1d5db; color: #111827; }
-body.light-theme .odometro-card { background: rgba(255, 255, 255, 0.95); border-color: rgba(0, 147, 69, 0.2); }
-body.light-theme .table-wrapper { background: #ffffff; border-color: #e5e7eb; }
-body.light-theme .excel-table { color: #111827; }
+tr.row-semaforo-rojo {
+    background-color: rgba(239, 68, 68, 0.06);
+}
 
-body.light-theme .excel-table thead tr.header-row-1,
-body.light-theme .excel-table thead tr.header-row-2 { background-color: #eceef1 !important; }
+body.light-theme .ordenes-module-header #search-input {
+    border-color: #d1d5db;
+    background: #ffffff;
+    color: #111827;
+}
 
-body.light-theme .excel-table th { color: #1f2937; border-color: #cbd5e1; }
-body.light-theme .excel-table th::before { background-color: #eceef1 !important; }
-body.light-theme .excel-table th:hover::before { background-color: #e2e8f0 !important; }
+body.light-theme .ordenes-module-header #search-input:focus {
+    background: #f8fafc;
+}
 
-body.light-theme .excel-table td { border-color: #e5e7eb !important; }
-body.light-theme .excel-table tbody tr:nth-child(odd) { background-color: #ffffff !important; }
-body.light-theme .excel-table tbody tr:nth-child(even) { background-color: #f8fafc !important; }
-body.light-theme .excel-table tbody tr:hover { background-color: rgba(0, 147, 69, 0.08) !important; }
+@media (max-width: 768px) {
+    .ordenes-module-header .inline-title {
+        flex-basis: 100%;
+    }
 
-body.light-theme tr.row-semaforo-amarillo { background-color: rgba(245, 158, 11, 0.08); }
-body.light-theme tr.row-semaforo-rojo { background-color: rgba(239, 68, 68, 0.08); }
+    .ordenes-module-header .inline-title h2 {
+        white-space: normal;
+    }
+
+    .ordenes-module-header .inline-search {
+        flex: 1 1 220px;
+    }
+}

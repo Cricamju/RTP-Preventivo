@@ -231,6 +231,16 @@ body.light-theme .excel-input {
     color: #0f172a !important;
 }
 
+body.light-theme .excel-input[type="date"],
+body.light-theme select.excel-input {
+    color-scheme: light;
+}
+
+body.light-theme select.excel-input option {
+    background: #ffffff;
+    color: #0f172a;
+}
+
 body.light-theme .excel-table tbody tr:nth-child(odd):not(.row-pinned-top):not(.row-subtable-extra) {
     background-color: #ffffff !important;
 }

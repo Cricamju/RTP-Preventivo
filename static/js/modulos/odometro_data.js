@@ -10,7 +10,11 @@ const modelosFlota = [
 ];
 
 let data = [];
-const modulosList = ['01', '02', '03', '04', '05', '06', '07'];
+const todosLosModulos = ['01', '02', '03', '04', '05', '06', '07'];
+const contextoModulos = window.RTP_MODULE_CONTEXT || {};
+const modulosList = contextoModulos.canSelectAnyModule
+    ? todosLosModulos
+    : (contextoModulos.assignedModule ? [contextoModulos.assignedModule] : []);
 
 let globalId = 1;
 modulosList.forEach((mod) => {

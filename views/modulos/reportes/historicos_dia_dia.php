@@ -1,11 +1,12 @@
 <?php
 // views/modulos/reportes/historicos_dia_dia.php
 $user_modulo = trim($_SESSION['modulo_usuario'] ?? '');
-$es_central = ($user_modulo === 'central');
+$modulo_asignado = rtpNormalizeModuleId($user_modulo);
+$puede_seleccionar_modulo = rtpCanSelectAnyModule();
 ?>
 <link rel="stylesheet" href="/static/css/components/table/master-table-layout.css?v=6.0">
 <link rel="stylesheet" href="/static/css/components/table/module-empty-state.css?v=4.0">
-<link rel="stylesheet" href="/static/css/components/table/data-table.css?v=1.0">
+<link rel="stylesheet" href="/static/css/components/table/data-table.css?v=2.0">
 <link rel="stylesheet" href="/static/css/components/table/pagination-fab.css?v=5.0">
 <link rel="stylesheet" href="/static/css/modulos/reportes/reportes.css?v=2.0">
 <link rel="stylesheet" href="/static/css/modulos/reportes/historicos_dia_dia.css?v=3.0">
@@ -18,15 +19,17 @@ $es_central = ($user_modulo === 'central');
 
         <div class="module-selector-box">
             <span class="module-label">MÓDULO</span>
-            <select id="rep-modulo-select" class="module-select-input" onchange="filtrarHistoricosDiaDia()" <?= (!$es_central) ? 'disabled' : '' ?>>
+            <select id="rep-modulo-select" class="module-select-input" data-module-selector onchange="filtrarHistoricosDiaDia()" <?= (!$puede_seleccionar_modulo) ? 'disabled' : '' ?>>
                 <option value="">- Seleccione -</option>
-                <option value="01" <?= ($user_modulo === '01' || $user_modulo === '1') ? 'selected' : '' ?>>Módulo 01</option>
-                <option value="02" <?= ($user_modulo === '02' || $user_modulo === '2') ? 'selected' : '' ?>>Módulo 02</option>
-                <option value="03" <?= ($user_modulo === '03' || $user_modulo === '3') ? 'selected' : '' ?>>Módulo 03</option>
-                <option value="04" <?= ($user_modulo === '04' || $user_modulo === '4') ? 'selected' : '' ?>>Módulo 04</option>
-                <option value="05" <?= ($user_modulo === '05' || $user_modulo === '5') ? 'selected' : '' ?>>Módulo 05</option>
-                <option value="06" <?= ($user_modulo === '06' || $user_modulo === '6') ? 'selected' : '' ?>>Módulo 06</option>
-                <option value="07" <?= ($user_modulo === '07' || $user_modulo === '7') ? 'selected' : '' ?>>Módulo 07</option>
+                <?php
+                    $modulosOpciones = $puede_seleccionar_modulo
+                        ? range(1, 7)
+                        : ($modulo_asignado !== null ? [(int) $modulo_asignado] : []);
+                    foreach ($modulosOpciones as $numeroModulo):
+                    $opcionModulo = str_pad((string) $numeroModulo, 2, '0', STR_PAD_LEFT);
+                ?>
+                    <option value="<?= $opcionModulo ?>" <?= ($modulo_asignado === $opcionModulo) ? 'selected' : '' ?>>Módulo <?= $opcionModulo ?></option>
+                <?php endforeach; ?>
             </select>
         </div>
 
@@ -83,8 +86,8 @@ $es_central = ($user_modulo === 'central');
 </div>
 
 <script>
-    const repUserModulo = "<?= htmlspecialchars($user_modulo) ?>";
+    const repUserModulo = <?= json_encode($user_modulo, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 </script>
-<script src="/static/js/modulos/odometro_data.js?v=2.0"></script>
+<script src="/static/js/modulos/odometro_data.js?v=3.0"></script>
 <script src="/static/js/components/pagination-fab.js?v=7.0"></script>
 <script src="/static/js/modulos/reportes/historicos_dia_dia.js?v=5.0"></script>

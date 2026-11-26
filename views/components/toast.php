@@ -19,4 +19,4 @@
   <?php endif; ?>
 </div>
 
-<script src="/static/js/components/toast.js?v=3.0"></script>
+<script src="/static/js/components/toast.js?v=4.0"></script>

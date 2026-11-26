@@ -2,15 +2,16 @@
 // views/modulos/odometro.php
 $rol_usuario = isset($_SESSION['rol']) ? strtolower(trim($_SESSION['rol'])) : 'consulta';
 $user_modulo = isset($_SESSION['modulo_usuario']) ? trim($_SESSION['modulo_usuario']) : ''; 
+$modulo_asignado = rtpNormalizeModuleId($user_modulo);
+$puede_seleccionar_modulo = rtpCanSelectAnyModule();
 
-$es_central = ($user_modulo === 'central');
-$modulos_validos = ['1', '2', '3', '4', '5', '6', '7', '01', '02', '03', '04', '05', '06', '07'];
-$modulo_valido = in_array($user_modulo, $modulos_validos);
-$es_admin = ((strtolower($_SESSION['rol'] ?? '') === 'admin' || strtolower($_SESSION['rol'] ?? '') === 'administrador') && ($es_central || $modulo_valido));
+$modulo_valido = $modulo_asignado !== null;
+$es_admin = (in_array($rol_usuario, ['admin', 'administrador'], true)
+    && ($puede_seleccionar_modulo || $modulo_valido));
 ?>
 <link rel="stylesheet" href="/static/css/components/table/master-table-layout.css?v=5.0">
 <link rel="stylesheet" href="/static/css/components/table/module-empty-state.css?v=4.0">
-<link rel="stylesheet" href="/static/css/components/table/data-table.css?v=1.0">
+<link rel="stylesheet" href="/static/css/components/table/data-table.css?v=2.0">
 <link rel="stylesheet" href="/static/css/components/table/pagination-fab.css?v=5.0">
 <link rel="stylesheet" href="/static/css/components/table/comparison-fab.css?v=3.0">
 
@@ -24,15 +25,17 @@ $es_admin = ((strtolower($_SESSION['rol'] ?? '') === 'admin' || strtolower($_SES
 
         <div class="module-selector-box">
             <span class="module-label">MÓDULO</span>
-            <select id="module-filter-select" class="module-select-input" onchange="filterTable()" <?php echo (!$es_central) ? 'disabled' : ''; ?>>
+            <select id="module-filter-select" class="module-select-input" data-module-selector onchange="filterTable()" <?php echo (!$puede_seleccionar_modulo) ? 'disabled' : ''; ?>>
                 <option value="">- Seleccione -</option>
-                <option value="01" <?php echo ($user_modulo === '01' || $user_modulo === '1') ? 'selected' : ''; ?>>Módulo 01</option>
-                <option value="02" <?php echo ($user_modulo === '02' || $user_modulo === '2') ? 'selected' : ''; ?>>Módulo 02</option>
-                <option value="03" <?php echo ($user_modulo === '03' || $user_modulo === '3') ? 'selected' : ''; ?>>Módulo 03</option>
-                <option value="04" <?php echo ($user_modulo === '04' || $user_modulo === '4') ? 'selected' : ''; ?>>Módulo 04</option>
-                <option value="05" <?php echo ($user_modulo === '05' || $user_modulo === '5') ? 'selected' : ''; ?>>Módulo 05</option>
-                <option value="06" <?php echo ($user_modulo === '06' || $user_modulo === '6') ? 'selected' : ''; ?>>Módulo 06</option>
-                <option value="07" <?php echo ($user_modulo === '07' || $user_modulo === '7') ? 'selected' : ''; ?>>Módulo 07</option>
+                <?php
+                    $modulosOpciones = $puede_seleccionar_modulo
+                        ? range(1, 7)
+                        : ($modulo_asignado !== null ? [(int) $modulo_asignado] : []);
+                    foreach ($modulosOpciones as $numeroModulo):
+                    $opcionModulo = str_pad((string) $numeroModulo, 2, '0', STR_PAD_LEFT);
+                ?>
+                    <option value="<?= $opcionModulo ?>" <?= ($modulo_asignado === $opcionModulo) ? 'selected' : '' ?>>Módulo <?= $opcionModulo ?></option>
+                <?php endforeach; ?>
             </select>
         </div>
 
@@ -153,10 +156,10 @@ $es_admin = ((strtolower($_SESSION['rol'] ?? '') === 'admin' || strtolower($_SES
 </div>
 
 <script>
-    const userRole = "<?php echo $rol_usuario; ?>";
-    const userAssignedModule = "<?php echo $user_modulo; ?>";
+    const userRole = <?= json_encode($rol_usuario, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+    const userAssignedModule = <?= json_encode($user_modulo, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 </script>
-<script src="/static/js/modulos/odometro_data.js?v=2.0"></script>
+<script src="/static/js/modulos/odometro_data.js?v=3.0"></script>
 <script src="/static/js/components/comparison-fab.js?v=3.0"></script>
-<script src="/static/js/modulos/odometro.js?v=49.0"></script>
+<script src="/static/js/modulos/odometro.js?v=50.0"></script>
 <script src="/static/js/components/pagination-fab.js?v=7.0"></script>

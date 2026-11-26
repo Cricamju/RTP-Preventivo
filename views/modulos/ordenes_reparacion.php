@@ -1,53 +1,5 @@
 <?php
 // views/modulos/ordenes_reparacion.php
-if (!isset($_SESSION['lista_ordenes_reparacion'])) {
-    $_SESSION['lista_ordenes_reparacion'] = [
-        [
-            'economico' => '6002', 
-            'modulo' => '03', 
-            'modelo' => 'Volvo Caio Access 2020', 
-            'tipo_servicio' => 'A (5000 +- 500)', 
-            'color' => 'verde',
-            'fecha_alta' => '2026-10-26', 
-            'no_orden' => '585', 
-            'fecha_odo' => '27-10-2026', 
-            'km_odo' => '429,358.4', 
-            'fecha_mant' => '24-09-2020', 
-            'km_mant' => '345,254.0', 
-            'km_acum' => '20,104.4', 
-            'dias' => '106'
-        ]
-    ];
-}
-
-// 🟢 1. Lógica de permisos y seguridad estricta con manejo flexible de ceros ('4' vs '04')
-$user_modulo = trim($_SESSION['modulo_usuario'] ?? '');
-$es_central = ($user_modulo === 'central');
-$modulos_validos = ['1', '2', '3', '4', '5', '6', '7', '01', '02', '03', '04', '05', '06', '07'];
-$modulo_valido = in_array($user_modulo, $modulos_validos);
-
-// 🟢 2. Filtrado seguro en el servidor (Negación por defecto si no hay módulo ni central)
-if ($es_central) {
-    $moduloActivo = $_SESSION['filtro_modulo_ordenes'] ?? '';
-    // Si es central, puede ver todas o filtrar por la seleccionada en el select
-    $ordenes = $_SESSION['lista_ordenes_reparacion'];
-    if (!empty($moduloActivo) && $moduloActivo !== 'todos') {
-        $ordenes = array_filter($ordenes, function($ord) use ($moduloActivo) {
-            return intval($ord['modulo']) === intval($moduloActivo);
-        });
-    }
-} elseif ($modulo_valido) {
-    // Si tiene un módulo asignado, filtramos strictly por su módulo en PHP usando intval
-    $moduloActivo = $user_modulo;
-    $ordenes = array_filter($_SESSION['lista_ordenes_reparacion'], function($ord) use ($user_modulo) {
-        return intval($ord['modulo']) === intval($user_modulo);
-    });
-} else {
-    // 🔒 Seguridad: Si el admin o usuario no tiene módulo ni es central, no ve nada
-    $moduloActivo = '';
-    $ordenes = [];
-}
-
 function obtenerPdfManualOrden($modelo) {
     $m = strtolower($modelo);
     if (strpos($m, 'biarticulado') !== false) return 'biarticulado.pdf';
@@ -62,14 +14,13 @@ function obtenerPdfManualOrden($modelo) {
     return 'Acces2020.pdf';
 }
 ?>
-<link rel="stylesheet" href="/static/css/modulos/ordenes_reparacion.css?v=5.0">
 <link rel="stylesheet" href="/static/css/components/table/module-empty-state.css?v=4.0">
 <link rel="stylesheet" href="/static/css/components/table/master-table-layout.css?v=7.0">
 <link rel="stylesheet" href="/static/css/components/table/data-table.css?v=2.0">
 <link rel="stylesheet" href="/static/css/components/table/pagination-fab.css?v=5.0">
+<link rel="stylesheet" href="/static/css/modulos/ordenes_reparacion.css?v=6.0">
 
-<!-- PANEL STICKY SUPERIOR -->
-<div class="odometro-sticky-header" id="sticky-panel">
+<div class="module-sticky-header ordenes-module-header" id="sticky-panel">
     <div class="header-content-inline">
         <div class="inline-title">
             <h2>📋 Parque Vehicular - Órdenes de Reparación</h2>
@@ -77,16 +28,20 @@ function obtenerPdfManualOrden($modelo) {
 
         <div class="module-selector-box">
             <span class="module-label">MÓDULO</span>
-            <select id="module-filter-select" class="module-select-input" onchange="filtrarOrdenes()" <?php echo (!$es_central) ? 'disabled' : ''; ?>>
+            <select id="module-filter-select" class="module-select-input" data-module-selector onchange="filtrarOrdenes()" <?php echo (!$puede_seleccionar_modulo) ? 'disabled' : ''; ?>>
                 <option value="" <?php echo empty($moduloActivo) ? 'selected' : ''; ?>>- Seleccione -</option>
-                <option value="todos" <?php echo ($moduloActivo === 'todos') ? 'selected' : ''; ?>>Todos los módulos</option>
-                <option value="01" <?php echo ($moduloActivo === '01') ? 'selected' : ''; ?>>Módulo 01</option>
-                <option value="02" <?php echo ($moduloActivo === '02') ? 'selected' : ''; ?>>Módulo 02</option>
-                <option value="03" <?php echo ($moduloActivo === '03') ? 'selected' : ''; ?>>Módulo 03</option>
-                <option value="04" <?php echo ($moduloActivo === '04') ? 'selected' : ''; ?>>Módulo 04</option>
-                <option value="05" <?php echo ($moduloActivo === '05') ? 'selected' : ''; ?>>Módulo 05</option>
-                <option value="06" <?php echo ($moduloActivo === '06') ? 'selected' : ''; ?>>Módulo 06</option>
-                <option value="07" <?php echo ($moduloActivo === '07') ? 'selected' : ''; ?>>Módulo 07</option>
+                <?php if ($puede_seleccionar_modulo): ?>
+                    <option value="todos">Todos los módulos</option>
+                <?php endif; ?>
+                <?php
+                    $modulosOpciones = $puede_seleccionar_modulo
+                        ? range(1, 7)
+                        : ($modulo_asignado !== null ? [(int) $modulo_asignado] : []);
+                    foreach ($modulosOpciones as $numeroModulo):
+                        $opcionModulo = str_pad((string) $numeroModulo, 2, '0', STR_PAD_LEFT);
+                ?>
+                    <option value="<?= $opcionModulo ?>" <?= ($moduloActivo === $opcionModulo) ? 'selected' : '' ?>>Módulo <?= $opcionModulo ?></option>
+                <?php endforeach; ?>
             </select>
         </div>
 
@@ -97,7 +52,7 @@ function obtenerPdfManualOrden($modelo) {
 </div>
 
 <!-- TARJETA Y TABLA PRINCIPAL -->
-<div class="management-card odometro-card module-state-container master-card">
+<div class="management-card module-state-container master-card">
     <div id="ordenes-empty-state" class="module-empty-card" <?php echo empty($moduloActivo) ? '' : 'hidden'; ?>>
         <span class="empty-icon">📋</span>
         <h3>Órdenes de reparación</h3>
@@ -213,70 +168,6 @@ function obtenerPdfManualOrden($modelo) {
     let paginaOrdenes = 1;
     const filasPorPaginaOrdenes = 50;
 
-    function ajustarAnchoColumnasOrdenes(mostrarColumnaModulo) {
-        const tabla = document.getElementById('tabla-ordenes');
-        const columnas = Array.from(tabla?.querySelectorAll('colgroup col') || []);
-        if (!tabla || !columnas.length) return;
-
-        columnas.forEach((columna, indice) => {
-            if (!columna.dataset.baseWidth) {
-                columna.dataset.baseWidth = String(Number.parseFloat(columna.style.width) || 0);
-            }
-            if (indice === 1) columna.style.display = mostrarColumnaModulo ? '' : 'none';
-        });
-
-        const columnasVisibles = columnas.filter((columna, indice) =>
-            indice !== 1 || mostrarColumnaModulo
-        );
-        const anchoBaseTotal = columnasVisibles.reduce(
-            (total, columna) => total + Number.parseFloat(columna.dataset.baseWidth || '0'),
-            0
-        );
-        if (!anchoBaseTotal) return;
-
-        tabla.style.width = '100%';
-        columnasVisibles.forEach(columna => {
-            const anchoBase = Number.parseFloat(columna.dataset.baseWidth || '0');
-            columna.style.width = `${(anchoBase / anchoBaseTotal) * 100}%`;
-        });
-    }
-
-    function adjustOrdenesStickyHeaders() {
-        const panel = document.getElementById('sticky-panel');
-        const wrapper = document.getElementById('table-wrapper-container');
-        const headerRows = document.querySelectorAll('#tabla-ordenes thead tr');
-        
-        if (!panel || !wrapper || headerRows.length === 0) return;
-
-        const rect = panel.getBoundingClientRect();
-        const panelBottom = Math.max(rect.bottom, 85); 
-
-        const wrapperRect = wrapper.getBoundingClientRect();
-        const theadHeight = document.querySelector('#tabla-ordenes thead').offsetHeight;
-
-        let offset = 0;
-
-        if (wrapperRect.top < panelBottom) {
-            offset = panelBottom - wrapperRect.top;
-            const maxOffset = wrapperRect.height - theadHeight;
-            if (offset > maxOffset) offset = maxOffset;
-        }
-
-        headerRows.forEach(tr => {
-            tr.style.transform = `translateY(${offset}px)`;
-            tr.style.position = 'relative';
-            tr.style.zIndex = '40';
-            if (offset > 0) {
-                tr.style.boxShadow = '0 5px 10px rgba(0,0,0,0.4)';
-            } else {
-                tr.style.boxShadow = 'none';
-            }
-        });
-    }
-
-    window.addEventListener('scroll', adjustOrdenesStickyHeaders);
-    window.addEventListener('resize', adjustOrdenesStickyHeaders);
-
     // 🟢 Filtrado estricto por Módulo corregido
     function filtrarOrdenes(resetPage = true) {
         const selectModulo = document.getElementById('module-filter-select');
@@ -312,7 +203,6 @@ function obtenerPdfManualOrden($modelo) {
         celdasModulo.forEach(td => {
             td.style.display = esTodos ? '' : 'none';
         });
-        ajustarAnchoColumnasOrdenes(esTodos);
 
         const filas = Array.from(document.querySelectorAll('#tabla-ordenes tbody tr'))
             .filter(fila => !fila.classList.contains('table-end-filler'));
@@ -342,7 +232,7 @@ function obtenerPdfManualOrden($modelo) {
 
         const hayRegistros = filasCoincidentes.length > 0;
         if (noRecordsState) noRecordsState.hidden = hayRegistros;
-        if (tableWrapper) tableWrapper.style.display = hayRegistros ? 'block' : 'none';
+        if (tableWrapper) tableWrapper.style.display = hayRegistros ? '' : 'none';
         if (typeof setTableModuleActive === 'function') setTableModuleActive(hayRegistros);
         renderPaginationFAB(
             'ordenes-pagination-controls',
@@ -355,15 +245,14 @@ function obtenerPdfManualOrden($modelo) {
             }
         );
         if (hayRegistros && typeof updateTableEndFiller === 'function') {
-            updateTableEndFiller(tableWrapper, document.getElementById('tabla-ordenes'), filasVisibles[0].cells.length);
+            const columnasVisibles = Array.from(document.querySelectorAll('#tabla-ordenes colgroup col'))
+                .filter(columna => getComputedStyle(columna).display !== 'none').length;
+            updateTableEndFiller(tableWrapper, document.getElementById('tabla-ordenes'), columnasVisibles);
         }
-
-        setTimeout(adjustOrdenesStickyHeaders, 50);
     }
 
     document.addEventListener('DOMContentLoaded', function() {
         filtrarOrdenes();
-        setTimeout(adjustOrdenesStickyHeaders, 50);
     });
 
     function editarOrden(economico, modulo, modelo, servicio, fechaOdo, kmOdo, fechaMant, kmMant, kmAcum, dias, color) {
