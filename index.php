@@ -41,6 +41,12 @@ switch ($requestUri) {
 
                         $_SESSION['rol'] = $user['rol'];
                         $_SESSION['username'] = $user['username'];
+                        $_SESSION['modulo_usuario'] = $user['modulo'] ?? '';
+
+                        $_SESSION['flash_messages'] = [
+                            ['message' => '👋 ¡Bienvenido al sistema, ' . htmlspecialchars($user['username']) . '!', 'type' => 'success'],
+                            ['message' => '💡 Tip: Explora el menú flotante inferior derecho para cambiar temas y letras de accesibilidad.', 'type' => 'info']
+                        ];
 
                         header("Location: /dashboard/" . strtolower($user['rol']));
                         exit;
@@ -118,9 +124,24 @@ switch ($requestUri) {
         break;
 
     case '/reportes':
+    case '/reportes/servicios-preventivos':
         if (!isset($_SESSION['rol'])) { header("Location: /"); exit; }
-        $page_title = "Generar Reportes";
-        $content_view = __DIR__ . "/views/modulos/reportes.php";
+        $page_title = "Reporte de Servicios Preventivos";
+        $content_view = __DIR__ . "/views/modulos/reportes/servicios_preventivos.php";
+        include __DIR__ . '/views/base.php';
+        break;
+
+    case '/reportes/historicos-km-preventivos':
+        if (!isset($_SESSION['rol'])) { header("Location: /"); exit; }
+        $page_title = "Históricos KM y Preventivos";
+        $content_view = __DIR__ . "/views/modulos/reportes/historicos_km_preventivos.php";
+        include __DIR__ . '/views/base.php';
+        break;
+
+    case '/reportes/historicos-dia-dia':
+        if (!isset($_SESSION['rol'])) { header("Location: /"); exit; }
+        $page_title = "Históricos KM Día Día";
+        $content_view = __DIR__ . "/views/modulos/reportes/historicos_dia_dia.php";
         include __DIR__ . '/views/base.php';
         break;
 
@@ -138,8 +159,17 @@ switch ($requestUri) {
         include __DIR__ . '/views/base.php';
         break;
 
+    case '/soporte-login':
+        include __DIR__ . '/views/login/login-support.php';
+        break;
+
     case '/logout':
+        $logoutFlash = [
+            ['message' => '🚪 Sesión cerrada correctamente en el sistema. ¡Hasta pronto!', 'type' => 'info']
+        ];
         session_destroy();
+        session_start();
+        $_SESSION['flash_messages'] = $logoutFlash;
         header("Location: /");
         exit;
         
@@ -149,6 +179,71 @@ switch ($requestUri) {
         $content_view = __DIR__ . "/views/modulos/odometro/generar_orden_reparacion.php";
         include __DIR__ . '/views/base.php';
         break;
+
+    case '/guardar-orden':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require_once __DIR__ . '/helpers/semaforo_helper.php';
+            
+            $economico = $_POST['economico'] ?? 'N/A';
+            $modulo = $_POST['modulo'] ?? '03';
+            $modelo = $_POST['modelo'] ?? 'Volvo Caio Access 2020';
+            $km_acum = $_POST['km_acum'] ?? '0.0';
+            
+            $_SESSION['filtro_modulo_ordenes'] = $modulo;
+            $semaforoInfo = calcularSemaforoMantenimientoPHP($km_acum, $modelo);
+
+            $nuevaOrden = [
+                'economico' => $economico,
+                'modulo' => $modulo,
+                'modelo' => $modelo,
+                'tipo_servicio' => $semaforoInfo['servicioTexto'],
+                'color' => $semaforoInfo['color'],
+                'fecha_alta' => $_POST['fecha_alta'] ?? date('Y-m-d'),
+                'no_orden' => rand(500, 999), 
+                'fecha_odo' => $_POST['fecha_odo'] ?? date('d-m-Y'),
+                'km_odo' => $_POST['km_odo'] ?? '0.0',
+                'fecha_mant' => $_POST['fecha_mant'] ?? 'N/A',
+                'km_mant' => $_POST['km_mant'] ?? '0.0',
+                'km_acum' => $km_acum,
+                'dias' => $_POST['dias'] ?? '0'
+            ];
+
+            if (!isset($_SESSION['lista_ordenes_reparacion'])) {
+                $_SESSION['lista_ordenes_reparacion'] = [];
+            }
+
+            $encontrado = false;
+            foreach ($_SESSION['lista_ordenes_reparacion'] as $key => $ord) {
+                if ($ord['economico'] === $economico) {
+                    $nuevaOrden['no_orden'] = $ord['no_orden']; 
+                    $_SESSION['lista_ordenes_reparacion'][$key] = $nuevaOrden;
+                    $encontrado = true;
+                    break;
+                }
+            }
+
+            if (!$encontrado) {
+                array_unshift($_SESSION['lista_ordenes_reparacion'], $nuevaOrden);
+            }
+        }
+        header("Location: /ordenes-reparacion");
+        exit;
+
+    case '/eliminar-orden':
+        if (isset($_GET['eco'])) {
+            $ecoAEliminar = $_GET['eco'];
+            if (isset($_SESSION['lista_ordenes_reparacion'])) {
+                $_SESSION['lista_ordenes_reparacion'] = array_filter(
+                    $_SESSION['lista_ordenes_reparacion'], 
+                    function($ord) use ($ecoAEliminar) {
+                        return $ord['economico'] !== $ecoAEliminar;
+                    }
+                );
+                $_SESSION['lista_ordenes_reparacion'] = array_values($_SESSION['lista_ordenes_reparacion']);
+            }
+        }
+        header("Location: /ordenes-reparacion");
+        exit;
 
     default:
         http_response_code(404);
@@ -163,54 +258,4 @@ switch ($requestUri) {
             include __DIR__ . '/views/error/error_public.php';
         }
         break;
-
-        // ... dentro del switch ($requestUri)
-    case '/ordenes-reparacion':
-        if (!isset($_SESSION['rol'])) { header("Location: /"); exit; }
-        $page_title = "Órdenes de Reparación";
-        $content_view = __DIR__ . "/views/modulos/ordenes_reparacion.php";
-        include __DIR__ . '/views/base.php';
-        break;
-
-        case '/guardar-orden':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $nuevaOrden = [
-                'economico' => $_POST['economico'] ?? 'N/A',
-                'modulo' => $_POST['modulo'] ?? '03',
-                'modelo' => $_POST['modelo'] ?? 'Unidad RTP',
-                'tipo_servicio' => $_POST['tipo_servicio'] ?? 'A',
-                'fecha_alta' => $_POST['fecha_alta'] ?? date('Y-m-d'),
-                'no_orden' => rand(500, 999),
-                'fecha_odo' => $_POST['fecha_odo'] ?? date('d-m-Y'),
-                'km_odo' => $_POST['km_odo'] ?? '0.0',
-                'fecha_mant' => $_POST['fecha_mant'] ?? 'N/A',
-                'km_mant' => $_POST['km_mant'] ?? '0.0',
-                'km_acum' => $_POST['km_acum'] ?? '0.0',
-                'dias' => $_POST['dias'] ?? '0'
-            ];
-
-            if (!isset($_SESSION['lista_ordenes_reparacion'])) {
-                $_SESSION['lista_ordenes_reparacion'] = [];
-            }
-            array_unshift($_SESSION['lista_ordenes_reparacion'], $nuevaOrden);
-        }
-        header("Location: /ordenes-reparacion");
-        exit;
-
-        case '/eliminar-orden':
-        if (isset($_GET['eco'])) {
-            $ecoAEliminar = $_GET['eco'];
-            if (isset($_SESSION['lista_ordenes_reparacion'])) {
-                $_SESSION['lista_ordenes_reparacion'] = array_filter(
-                    $_SESSION['lista_ordenes_reparacion'], 
-                    function($ord) use ($ecoAEliminar) {
-                        return $ord['economico'] !== $ecoAEliminar;
-                    }
-                );
-                // Reindexar el arreglo para mantener orden limpio
-                $_SESSION['lista_ordenes_reparacion'] = array_values($_SESSION['lista_ordenes_reparacion']);
-            }
-        }
-        header("Location: /ordenes-reparacion");
-        exit;
 }

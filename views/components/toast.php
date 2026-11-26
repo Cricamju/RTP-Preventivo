@@ -3,9 +3,14 @@
     <!-- Las notificaciones se inyectarán aquí dinámicamente vía JS -->
 </div>
 
-<!-- Contenedor invisible para que JS lea los mensajes de sesión de PHP -->
+<!-- Contenedor invisible para que JS lea los mensajes múltiples de sesión de PHP -->
 <div id="flask-messages" style="display: none;">
-  <?php if (isset($_SESSION['flash_message'])): ?>
+  <?php if (isset($_SESSION['flash_messages']) && is_array($_SESSION['flash_messages'])): ?>
+      <?php foreach ($_SESSION['flash_messages'] as $flash): ?>
+          <span class="flask-flash" data-category="<?= $flash['type'] ?? 'info' ?>" data-message="<?= htmlspecialchars($flash['message']) ?>"></span>
+      <?php endforeach; ?>
+      <?php unset($_SESSION['flash_messages']); ?>
+  <?php elseif (isset($_SESSION['flash_message'])): ?>
       <span class="flask-flash" data-category="<?= $_SESSION['flash_type'] ?? 'info' ?>" data-message="<?= htmlspecialchars($_SESSION['flash_message']) ?>"></span>
       <?php 
       unset($_SESSION['flash_message']);
@@ -14,5 +19,4 @@
   <?php endif; ?>
 </div>
 
-<!-- Importar la lógica global de las alertas con la nueva ruta de carpetas -->
-<script src="/static/js/components/toast.js"></script>
+<script src="/static/js/components/toast.js?v=3.0"></script>

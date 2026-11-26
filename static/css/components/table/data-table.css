@@ -1,0 +1,275 @@
+/* Reusable data-table skin. Pair with master-table-layout.css for the table box. */
+.excel-table {
+    width: 100% !important;
+    min-width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: collapse;
+    color: var(--text-light, #f8fafc);
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.excel-table th {
+    color: var(--text-light, #f8fafc);
+    padding: 10px 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: var(--table-header-background, rgba(18, 21, 18, 0.88)) !important;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.excel-table th.group-header {
+    background: var(--table-group-header-background, rgba(9, 19, 9, 0.9)) !important;
+    color: var(--rtp-green, #009345) !important;
+    border-bottom: 2px solid var(--rtp-green, #009345) !important;
+}
+
+.header-filter-row th {
+    padding: 4px !important;
+    border-bottom: 2px solid var(--rtp-green, #009345) !important;
+    background: var(--table-header-filter-background, rgba(14, 17, 14, 0.9)) !important;
+}
+
+.column-filter {
+    width: 100%;
+    padding: 4px 6px;
+    font-size: 0.72rem;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-light, #f8fafc);
+    border-radius: 4px;
+    text-align: center;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.excel-table td {
+    padding: 0;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    overflow: hidden;
+}
+
+.excel-input {
+    width: 100%;
+    height: 100%;
+    min-height: 38px;
+    background: transparent;
+    border: none;
+    color: var(--text-light, #ffffff) !important;
+    padding: 6px 4px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    text-align: center;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.excel-input[type="date"] {
+    color-scheme: dark;
+    font-size: 0.75rem;
+}
+
+.excel-input:read-only {
+    cursor: default;
+    background: rgba(0, 0, 0, 0.15);
+}
+
+select.excel-input {
+    appearance: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+select.excel-input option {
+    background: #1f2937;
+    color: #ffffff;
+}
+
+.status-detenida {
+    color: #ef4444 !important;
+    font-weight: 600;
+    background: rgba(239, 68, 68, 0.05) !important;
+}
+
+.status-operando {
+    color: #10b981 !important;
+    font-weight: 600;
+}
+
+.btn-action-doc {
+    background: rgba(0, 147, 69, 0.15);
+    border: 1px solid var(--rtp-green, #009345);
+    color: var(--rtp-green, #009345);
+    padding: 5px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-action-doc:hover {
+    background: var(--rtp-green, #009345);
+    color: #ffffff;
+    transform: scale(1.05);
+}
+
+.btn-delete-row {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: #ef4444;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-delete-row:hover {
+    background: #ef4444;
+    color: #ffffff;
+    transform: scale(1.08);
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+.semaforo-badge-cell {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.semaforo-badge-cell.verde {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.semaforo-badge-cell.amarillo {
+    background-color: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.semaforo-badge-cell.rojo {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.excel-table tbody tr:nth-child(even):not(.row-pinned-top):not(.row-subtable-extra) {
+    background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+.excel-table tbody tr:nth-child(odd):not(.row-pinned-top):not(.row-subtable-extra) {
+    background-color: rgba(0, 0, 0, 0.18) !important;
+}
+
+tr.row-subtable-extra {
+    background-color: #0b0e0b !important;
+    border-bottom: 2px solid var(--rtp-green, #009345) !important;
+    border-left: 5px solid var(--rtp-green, #009345) !important;
+}
+
+.subcell-extra {
+    padding: 8px 6px !important;
+    font-size: 0.78rem;
+    color: #f8fafc;
+    background: #0f120f !important;
+    border-right: 1px dashed rgba(0, 147, 69, 0.3) !important;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.subcell-label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: var(--rtp-green, #009345);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.subcell-val {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #ffffff;
+}
+
+body.light-theme .excel-table th {
+    color: #0f172a !important;
+    border-color: var(--table-header-border, #cbd5e1) !important;
+}
+
+body.light-theme .header-filter-row th {
+    border-color: var(--table-header-border, #94a3b8) !important;
+}
+
+body.light-theme .excel-table {
+    color: #0f172a !important;
+}
+
+body.light-theme .excel-input {
+    color: #0f172a !important;
+}
+
+body.light-theme .excel-table tbody tr:nth-child(odd):not(.row-pinned-top):not(.row-subtable-extra) {
+    background-color: #ffffff !important;
+}
+
+body.light-theme .excel-table tbody tr:nth-child(even):not(.row-pinned-top):not(.row-subtable-extra) {
+    background-color: #f1f5f9 !important;
+}
+
+body.light-theme tr.row-subtable-extra {
+    background: #e2e8f0 !important;
+    border-bottom: 2px solid var(--rtp-green, #009345) !important;
+    border-left: 5px solid var(--rtp-green, #009345) !important;
+}
+
+body.light-theme .subcell-extra {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+    border-right: 1px dashed rgba(0, 147, 69, 0.4) !important;
+}
+
+body.light-theme .subcell-val {
+    color: #0f172a !important;
+}
+
+body.light-theme .subcell-label {
+    color: var(--rtp-green, #009345) !important;
+}
+
+body.light-theme .column-filter {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+body.light-theme .column-filter::placeholder {
+    color: #94a3b8 !important;
+}
+
+body.light-theme .excel-input:read-only {
+    background: transparent !important;
+    color: #0f172a !important;
+}

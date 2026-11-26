@@ -1,13 +1,19 @@
+<?php
+// views/login/login_support.php
+?>
 <!DOCTYPE html>
 <html lang="es-MX">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Soporte | RTP-Preventivo</title>
-    <link rel="icon" href="{{ url_for('static', filename='img/logos/logo_oficial.png') }}" type="image/png">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/base_public.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/support.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <link rel="icon" href="/static/img/logos/main_logo.png" type="image/png">
+    
+    <!-- 🟢 RUTAS DE CSS ORGANIZADAS -->
+    <link rel="stylesheet" href="/static/css/base/base_public.css">
+    <link rel="stylesheet" href="/static/css/login/login.css">
+    <link rel="stylesheet" href="/static/css/login/support.css">
+    <link rel="stylesheet" href="/static/css/components/accessibility.css">
 </head>
 <body>
 
@@ -15,7 +21,7 @@
 
     <header class="glass-panel">
         <a href="/" class="header-left" style="text-decoration: none; cursor: pointer;">
-            <img src="{{ url_for('static', filename='img/logos/logo-rtp.png') }}" alt="Logo Oficial RTP" class="header-logo">
+            <img src="/static/img/logos/logo-rtp.png" alt="Logo Oficial RTP" class="header-logo">
             <h1>RED DE TRANSPORTE DE PASAJEROS</h1>
         </a>
         
@@ -26,7 +32,7 @@
 
     <!-- Menú Desplegable del Login -->
     <div id="login-dropdown" class="login-dropdown">
-        <form action="{{ url_for('main.login') }}" method="POST">
+        <form action="/" method="POST">
             <div class="input-group">
                 <label for="drop-username">Login:</label>
                 <input type="text" id="drop-username" name="username" required autocomplete="off">
@@ -54,7 +60,7 @@
             <details>
                 <summary>Mi usuario aparece bloqueado</summary>
                 <div class="faq-content">
-                    El sistema bloquea automáticamente las cuentas tras <strong>3 intentos fallidos</strong> de inicio de sesión. El bloqueo es temporal y se liberará tras 15 minutos. Si el problema persiste, contacta al administrador del sistema.
+                    El sistema bloquea automáticamente las cuentas tras <strong>5 intentos fallidos</strong> de inicio de sesión. El bloqueo es temporal y se liberará tras 5 minutos. Si el problema persiste, contacta al administrador del sistema.
                 </div>
             </details>
 
@@ -72,20 +78,22 @@
                 </div>
             </details>
 
-            <a href="{{ url_for('main.login') }}" class="back-btn">← Regresar al inicio de sesión</a>
+            <a href="/" class="back-btn">← Regresar al inicio de sesión</a>
         </div>
     </main>
 
-    {% include 'components/footer.html' %}
-    {% include 'components/fab.html' %}
+    <?php 
+    @include __DIR__ . '/../components/footer.php';
+    @include __DIR__ . '/../components/fab.php';
+    @include __DIR__ . '/../components/toast.php';
+    ?>
 
-    <script src="{{ url_for('static', filename='js/cache-control.js') }}"></script>
+    <!-- 🟢 SCRIPTS DE COMPONENTES -->
+    <script src="/static/js/components/theme.js"></script>
+    <script src="/static/js/components/cache-control.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // ==========================================
-            // Lógica del menú desplegable superior
-            // ==========================================
             const headerLoginBtn = document.getElementById('header-login-btn');
             const loginDropdown = document.getElementById('login-dropdown');
 
@@ -101,9 +109,6 @@
                     }
                 });
             }
-            
-            // ¡Se eliminó todo el JS conflictivo de las FAQ! 
-            // Ahora CSS hace la magia limpia.
         });
     </script>
 </body>

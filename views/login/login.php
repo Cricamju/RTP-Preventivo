@@ -6,7 +6,7 @@
     <title>Login | RTP-Preventivo</title>
     <link rel="icon" href="/static/img/logos/main_logo.png" type="image/png">
     
-    <!-- 🟢 NUEVAS RUTAS DE CSS ORGANIZADAS -->
+    <!-- 🟢 RUTAS DE CSS ORGANIZADAS -->
     <link rel="stylesheet" href="/static/css/base/base_public.css">
     <link rel="stylesheet" href="/static/css/login/login.css">
     <link rel="stylesheet" href="/static/css/components/accessibility.css">
@@ -59,7 +59,8 @@
     @include __DIR__ . '/../components/toast.php';
     ?>
     
-    <!-- 🟢 NUEVA RUTA DE JS ORGANIZADO -->
+    <!-- 🟢 SCRIPTS DE COMPONENTES (INCLUYENDO GESTIÓN DE TEMAS) -->
+    <script src="/static/js/components/theme.js"></script>
     <script src="/static/js/components/cache-control.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {

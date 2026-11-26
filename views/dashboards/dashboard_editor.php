@@ -1,10 +1,9 @@
-<div class="welcome-card">
-    <h2>Panel de Captura (Taller)</h2>
-    <p>Bienvenido al módulo operativo. Tu perfil tiene permisos para:</p>
+<div class="welcome-card dashboard-card">
+    <h2>🚌 Panel de Operación</h2>
+    <p>Tu perfil permite registrar y dar seguimiento a la operación de las unidades de tu módulo.</p>
     <ul>
-        <li>Ingresar la captura diaria de Odómetro.</li>
-        <li>Registrar Órdenes de Reparación.</li>
-        <li>Actualizar el Módulo GSP.</li>
+        <li>⏱️ Capturar y actualizar lecturas de odómetro y estado de las unidades.</li>
+        <li>🧰 Consultar y gestionar órdenes de reparación.</li>
     </ul>
-    <p><em>Selecciona el módulo correspondiente en el menú lateral.</em></p>
+    <p><em>Abre Odómetro u Órdenes de Reparación desde el menú lateral.</em></p>
 </div>

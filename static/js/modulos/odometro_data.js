@@ -59,3 +59,110 @@ modulosList.forEach((mod) => {
         });
     }
 });
+
+const reporteHistorialOdometro = [];
+const reporteServiciosPreventivos = [];
+const fechaReferenciaReportes = new Date();
+fechaReferenciaReportes.setHours(12, 0, 0, 0);
+
+function fechaReporteISO(fecha) {
+    return [
+        fecha.getFullYear(),
+        String(fecha.getMonth() + 1).padStart(2, '0'),
+        String(fecha.getDate()).padStart(2, '0')
+    ].join('-');
+}
+
+function moverFechaReporte(fecha, dias) {
+    const resultado = new Date(fecha);
+    resultado.setDate(resultado.getDate() + dias);
+    return resultado;
+}
+
+data.forEach((unidad) => {
+    const kmActual = parseFloat(unidad.kmActual) || 0;
+    const kmAcumulado = parseFloat(unidad.kmAcum) || 0;
+    const serviciosUnidad = [];
+
+    for (let anioOffset = 1; anioOffset >= 0; anioOffset--) {
+        const anio = fechaReferenciaReportes.getFullYear() - anioOffset;
+
+        for (let trimestre = 0; trimestre < 4; trimestre++) {
+            const mes = (trimestre * 3 + (unidad.id % 3)) % 12;
+            const dia = 2 + ((unidad.id * 7 + trimestre * 5 + anioOffset * 3) % 24);
+            const fechaCreacion = new Date(anio, mes, dia, 12);
+            if (fechaCreacion > fechaReferenciaReportes) continue;
+
+            const fechaIngreso = moverFechaReporte(fechaCreacion, 1 + (unidad.id % 2));
+            const fechaSalida = moverFechaReporte(fechaIngreso, 1 + (trimestre % 2));
+            const mesesAtras = Math.max(
+                0,
+                (fechaReferenciaReportes.getFullYear() - anio) * 12
+                    + fechaReferenciaReportes.getMonth() - mes
+            );
+            const kmOrden = Math.max(1000, kmActual - mesesAtras * (600 + (unidad.id % 7) * 50));
+            const folio = String(700000 + unidad.id * 8 + trimestre + anioOffset * 4);
+            const intervaloServicio = unidad.modelo.toLowerCase().includes('yutong')
+                || unidad.modelo.toLowerCase().includes('dina')
+                ? 15000
+                : unidad.modelo.toLowerCase().includes('masa')
+                    ? 12000
+                    : unidad.modelo.toLowerCase().includes('cosmopolitan')
+                        ? 10000
+                        : 5000;
+            const letrasServicio = ['A', 'B', 'C', 'D'];
+            const cantidadServicios = Math.max(1, Math.min(4, Math.floor(kmOrden / intervaloServicio) % 4 + 1));
+
+            serviciosUnidad.push({
+                id: `${unidad.id}-${anio}-${trimestre}`,
+                unidadId: unidad.id,
+                modulo: unidad.modulo,
+                economico: unidad.economico,
+                fechaCreacion: fechaReporteISO(fechaCreacion),
+                noOrden: folio,
+                tipoServicio: letrasServicio.slice(0, cantidadServicios).join(' + '),
+                kmCreacion: kmOrden.toFixed(1),
+                fechaIngreso: fechaReporteISO(fechaIngreso),
+                kmIngreso: (kmOrden + 120 + (unidad.id % 90)).toFixed(1),
+                fechaSalida: fechaReporteISO(fechaSalida)
+            });
+        }
+    }
+
+    serviciosUnidad.sort((a, b) => a.fechaIngreso.localeCompare(b.fechaIngreso));
+    reporteServiciosPreventivos.push(...serviciosUnidad);
+
+    for (let diasAtras = 30; diasAtras >= 0; diasAtras--) {
+        const fechaRegistro = moverFechaReporte(fechaReferenciaReportes, -diasAtras);
+        const kmRegistro = Math.max(
+            0,
+            kmActual - diasAtras * (75 + (unidad.id % 41) * 3)
+        );
+        const kmAcumuladoRegistro = Math.max(
+            0,
+            kmAcumulado - diasAtras * (48 + (unidad.id % 19) * 4)
+        );
+        const serviciosPrevios = serviciosUnidad
+            .filter(servicio => servicio.fechaIngreso <= fechaReporteISO(fechaRegistro));
+        const ultimoServicio = serviciosPrevios[serviciosPrevios.length - 1];
+        const fechaUltimoMant = ultimoServicio?.fechaIngreso || unidad.fechaMant;
+        const kmUltimoMant = ultimoServicio?.kmIngreso || unidad.kmMant;
+
+        reporteHistorialOdometro.push({
+            unidadId: unidad.id,
+            modulo: unidad.modulo,
+            economico: unidad.economico,
+            fecha: fechaReporteISO(fechaRegistro),
+            odometro: kmRegistro.toFixed(1),
+            kmAcumulado: kmAcumuladoRegistro.toFixed(1),
+            ordenFecha: ultimoServicio?.fechaCreacion || '',
+            ordenFolio: ultimoServicio?.noOrden || '',
+            ultimoMantFecha: fechaUltimoMant,
+            ultimoMantKm: kmUltimoMant,
+            serviciosEfectuados: String(Math.max(
+                0,
+                parseInt(unidad.servicios, 10) - Math.floor(diasAtras / 30)
+            ))
+        });
+    }
+});

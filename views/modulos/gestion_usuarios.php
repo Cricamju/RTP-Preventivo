@@ -14,24 +14,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
     $password = $_POST['password'] ?? '';
     $adscripcion = $_POST['adscripcion'] ?? '';
     $categoria = $_POST['categoria_puesto'] ?? '';
+    $modulo_usuario = $_POST['modulo'] ?? ''; // 🟢 Capturar el módulo o central
     $rol = $_POST['rol'] ?? 'Consulta';
     $activo = ($_POST['activo'] === 'true') ? true : false;
 
     if (!empty($id)) {
-        // Actualizar usuario existente y limpiar bloqueos automáticamente
+        // Actualizar usuario existente incluyendo el módulo
         if (!empty($password)) {
             $passHash = password_hash($password, PASSWORD_DEFAULT);
-            $update = $pdo->prepare("UPDATE usuarios SET nombre_completo = ?, correo_institucional = ?, username = ?, password_hash = ?, adscripcion = ?, categoria_puesto = ?, rol = ?, activo = ?, intentos_fallidos = 0, bloqueado_hasta = NULL WHERE id = ?");
-            $update->execute([$nombre_completo, $correo, $username, $passHash, $adscripcion, $categoria, $rol, $activo, $id]);
+            $update = $pdo->prepare("UPDATE usuarios SET nombre_completo = ?, correo_institucional = ?, username = ?, password_hash = ?, adscripcion = ?, categoria_puesto = ?, modulo = ?, rol = ?, activo = ?, intentos_fallidos = 0, bloqueado_hasta = NULL WHERE id = ?");
+            $update->execute([$nombre_completo, $correo, $username, $passHash, $adscripcion, $categoria, $modulo_usuario, $rol, $activo, $id]);
         } else {
-            $update = $pdo->prepare("UPDATE usuarios SET nombre_completo = ?, correo_institucional = ?, username = ?, adscripcion = ?, categoria_puesto = ?, rol = ?, activo = ?, intentos_fallidos = 0, bloqueado_hasta = NULL WHERE id = ?");
-            $update->execute([$nombre_completo, $correo, $username, $adscripcion, $categoria, $rol, $activo, $id]);
+            $update = $pdo->prepare("UPDATE usuarios SET nombre_completo = ?, correo_institucional = ?, username = ?, adscripcion = ?, categoria_puesto = ?, modulo = ?, rol = ?, activo = ?, intentos_fallidos = 0, bloqueado_hasta = NULL WHERE id = ?");
+            $update->execute([$nombre_completo, $correo, $username, $adscripcion, $categoria, $modulo_usuario, $rol, $activo, $id]);
         }
     } else {
-        // Crear nuevo usuario con contraseña por defecto si viene vacía
+        // Crear nuevo usuario incluyendo el módulo
         $passHash = password_hash(!empty($password) ? $password : 'rtp2026', PASSWORD_DEFAULT);
-        $insert = $pdo->prepare("INSERT INTO usuarios (nombre_completo, correo_institucional, username, password_hash, adscripcion, categoria_puesto, rol, activo, intentos_fallidos, bloqueado_hasta) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, NULL)");
-        $insert->execute([$nombre_completo, $correo, $username, $passHash, $adscripcion, $categoria, $rol, $activo]);
+        $insert = $pdo->prepare("INSERT INTO usuarios (nombre_completo, correo_institucional, username, password_hash, adscripcion, categoria_puesto, modulo, rol, activo, intentos_fallidos, bloqueado_hasta) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, NULL)");
+        $insert->execute([$nombre_completo, $correo, $username, $passHash, $adscripcion, $categoria, $modulo_usuario, $rol, $activo]);
     }
     
     header("Location: /gestion-usuarios");
@@ -45,7 +46,7 @@ $ahora = (new DateTime())->format('Y-m-d H:i:s');
     <div class="management-header">
         <div>
             <h2>👥 Gestión de Usuarios</h2>
-            <p>Administración de cuentas, roles y desbloqueo de accesos locales.</p>
+            <p>Administración de cuentas, roles, módulos y desbloqueo de accesos locales.</p>
         </div>
         <button class="btn-primary btn-add-user" onclick="openModal()">
             + Nuevo Usuario
@@ -58,7 +59,7 @@ $ahora = (new DateTime())->format('Y-m-d H:i:s');
                 <tr>
                     <th>Nombre y Correo</th>
                     <th>Usuario (Login)</th>
-                    <th>Rol</th>
+                    <th>Rol / Asignación</th>
                     <th>Adscripción</th>
                     <th>Estatus</th>
                     <th style="text-align: center;">Acciones</th>
@@ -80,6 +81,10 @@ $ahora = (new DateTime())->format('Y-m-d H:i:s');
                         <?php else: ?>
                             <span class="role-badge consulta">Consulta</span>
                         <?php endif; ?>
+                        <br>
+                        <small style="color: var(--rtp-green); font-weight: 600;">
+                            <?= ($u['modulo'] === 'central') ? '🏢 Oficinas Centrales' : 'Módulo ' . htmlspecialchars($u['modulo'] ?? 'N/A') ?>
+                        </small>
                     </td>
                     <td><?= htmlspecialchars($u['adscripcion'] ?? 'N/A') ?></td>
                     <td>
@@ -101,6 +106,7 @@ $ahora = (new DateTime())->format('Y-m-d H:i:s');
                                     rol: '<?= $u['rol'] ?>', 
                                     adscripcion: '<?= htmlspecialchars($u['adscripcion'] ?? '', ENT_QUOTES) ?>', 
                                     categoria_puesto: '<?= htmlspecialchars($u['categoria_puesto'] ?? '', ENT_QUOTES) ?>', 
+                                    modulo: '<?= htmlspecialchars($u['modulo'] ?? '', ENT_QUOTES) ?>',
                                     activo: '<?= $u['activo'] ? 'true' : 'false' ?>', 
                                     bloqueado: '<?= (!empty($u['bloqueado_hasta']) && $u['bloqueado_hasta'] > $ahora) ? 'true' : 'false' ?>',
                                     bloqueado_hasta: '<?= $u['bloqueado_hasta'] ?? '' ?>'
@@ -159,6 +165,22 @@ $ahora = (new DateTime())->format('Y-m-d H:i:s');
                     <input type="text" id="categoria_puesto" name="categoria_puesto">
                 </div>
 
+                <!-- 🟢 NUEVO CAMPO: SELECCIÓN DE MÓDULO O CENTRAL -->
+                <div class="input-group">
+                    <label>Asignación de Módulo / Central *</label>
+                    <select id="modulo" name="modulo" required>
+                        <option value="">- Seleccione Asignación -</option>
+                        <option value="01">Módulo 01</option>
+                        <option value="02">Módulo 02</option>
+                        <option value="03">Módulo 03</option>
+                        <option value="04">Módulo 04</option>
+                        <option value="05">Módulo 05</option>
+                        <option value="06">Módulo 06</option>
+                        <option value="07">Módulo 07</option>
+                        <option value="central">Oficinas Centrales (Todos)</option>
+                    </select>
+                </div>
+
                 <div class="input-group">
                     <label>Rol en el Sistema *</label>
                     <select id="rol" name="rol" required>
@@ -197,5 +219,4 @@ $ahora = (new DateTime())->format('Y-m-d H:i:s');
     </div>
 </div>
 
-<!-- 🟢 Ruta corregida del JS principal de usuarios -->
 <script src="/static/js/modulos/gestion_usuarios.js?v=4.0"></script>

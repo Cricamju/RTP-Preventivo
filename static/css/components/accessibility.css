@@ -254,14 +254,14 @@ input {
    ========================================= */
 .toast-container {
     position: fixed;
-    top: 125px; /* Posición original */
+    top: 120px;
     right: 30px;
     z-index: 5000;
     pointer-events: none;
     display: flex;
-    flex-direction: column; /* Apilar una debajo de otra */
-    gap: 15px; /* Espacio entre alertas */
-    transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Transición suave si se desplaza por el menú */
+    flex-direction: column;
+    gap: 15px;
+    transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .toast-box {
@@ -270,30 +270,29 @@ input {
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--glass-border);
     border-radius: 12px;
-    padding: 15px 20px;
-    min-width: 300px;
-    max-width: 420px;
+    padding: 18px 22px; /* Espaciado más cómodo y natural */
+    min-width: 320px;
+    max-width: 450px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     display: flex;
-    align-items: center;
-    gap: 12px;
+    align-items: flex-start;
+    gap: 14px;
     color: var(--text-light);
     pointer-events: auto;
     
-    /* Estado Oculto (Fuera de pantalla a la derecha) */
     transform: translateX(120%);
     opacity: 0;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease, margin 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
 }
 
-/* Estado Visible (Activado por JS) */
 .toast-box.show {
     transform: translateX(0);
     opacity: 1;
 }
 
 .toast-icon {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
+    line-height: 1;
 }
 
 .toast-content {
@@ -302,16 +301,16 @@ input {
 
 .toast-content p {
     margin: 0;
-    font-size: 0.95rem;
+    font-size: 0.9rem; /* Letra estándar y legible por defecto */
     font-weight: 500;
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
 .toast-close {
     background: transparent;
     border: none;
     color: var(--text-muted);
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     cursor: pointer;
     padding: 0 4px;
     line-height: 1;
@@ -322,9 +321,11 @@ input {
     color: var(--text-light);
 }
 
-.toast-box.success { border-left: 5px solid var(--rtp-green); }
-.toast-box.error { border-left: 5px solid #ef4444; }
-.toast-box.info { border-left: 5px solid #3b82f6; }
+/* 🟢 Código de colores en la esquina/borde izquierdo */
+.toast-box.success { border-left: 6px solid #10b981; } /* Verde éxito */
+.toast-box.warning { border-left: 6px solid #f59e0b; } /* Amarillo advertencia */
+.toast-box.error   { border-left: 6px solid #ef4444; } /* Rojo peligro/eliminar */
+.toast-box.info    { border-left: 6px solid #3b82f6; } /* Azul info/tips */
 
 /* =========================================
    MEDIA QUERIES - NOTIFICACIONES MÓVILES
@@ -352,4 +353,15 @@ input {
         /* Cae suavemente a su posición normal */
         transform: translateY(0);
     }
+}
+
+/* =========================================
+   BLOQUEO DE INTERACCIÓN MODAL PERSISTENTE
+   ========================================= */
+body.modal-blocking-active header,
+body.modal-blocking-active .sidebar,
+body.modal-blocking-active .odometro-sticky-header {
+    pointer-events: none !important;
+    user-select: none;
+    opacity: 0.9; /* Opcional: un ligero toque visual para indicar que están inactivos */
 }

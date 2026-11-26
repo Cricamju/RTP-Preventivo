@@ -32,6 +32,7 @@ function openModal(userData = null) {
         document.getElementById('rol').value = userData.rol || 'Consulta';
         document.getElementById('adscripcion').value = userData.adscripcion || '';
         document.getElementById('categoria_puesto').value = userData.categoria_puesto || '';
+        document.getElementById('modulo').value = userData.modulo || ''; // 🟢 Asignar el módulo al abrir el modal
         document.getElementById('activo').value = userData.activo || 'true';
     } else {
         modalTitle.innerHTML = '➕ Nuevo Usuario';

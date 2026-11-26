@@ -1,0 +1,152 @@
+/* ==========================================================
+   MASTER TABLE LAYOUT - Componente Global Reutilizable
+   ========================================================== */
+
+main.content-area {
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 0% !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    box-sizing: border-box !important;
+}
+
+.module-sticky-header {
+    position: relative;
+    z-index: 500;
+    width: 100% !important;
+    flex: 0 0 auto;
+    background: rgba(14, 17, 14, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 2px solid var(--rtp-green, #009345);
+    padding: 12px 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    box-sizing: border-box !important;
+}
+
+body.light-theme .module-sticky-header {
+    background: rgba(250, 250, 250, 0.92) !important;
+    border-bottom-color: var(--rtp-green, #009345) !important;
+}
+
+.management-card.master-card {
+    position: relative;
+    width: calc(100% - 40px) !important;
+    max-width: calc(100% - 40px) !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: var(--glass-bg, rgba(20, 20, 20, 0.88)) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
+    border-radius: 16px;
+    padding: 16px 20px !important;
+    margin: 20px auto !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+}
+
+body.light-theme .management-card.master-card {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-color: rgba(0, 147, 69, 0.2) !important;
+}
+
+.master-table-wrapper {
+    --table-header-background: rgba(18, 21, 18, 0.88);
+    --table-header-filter-background: rgba(14, 17, 14, 0.9);
+    --table-group-header-background: rgba(9, 19, 9, 0.9);
+    --table-header-border: rgba(255, 255, 255, 0.2);
+    --table-header-text: #f8fafc;
+    flex: 1 !important;
+    min-height: 0 !important;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.3);
+    width: 100% !important;
+    overflow: auto !important;
+    position: relative !important;
+}
+
+.master-table-wrapper table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.master-table-wrapper thead {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    background-color: var(--table-header-background, #121512);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    isolation: isolate;
+}
+
+.master-table-wrapper thead th {
+    color: var(--table-header-text, #f8fafc);
+    background-color: var(--table-header-background, rgba(18, 21, 18, 0.88)) !important;
+    background-clip: padding-box;
+    border-color: var(--table-header-border, rgba(255, 255, 255, 0.2)) !important;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+}
+
+.master-table-wrapper thead .header-filter-row th {
+    background-color: var(--table-header-filter-background, rgba(14, 17, 14, 0.9)) !important;
+}
+
+.master-table-wrapper thead th.group-header {
+    background-color: var(--table-group-header-background, rgba(9, 19, 9, 0.9)) !important;
+}
+
+body.light-theme .master-table-wrapper {
+    --table-header-background: rgba(226, 232, 240, 0.9);
+    --table-header-filter-background: rgba(203, 213, 225, 0.94);
+    --table-group-header-background: rgba(219, 228, 236, 0.94);
+    --table-header-border: rgba(100, 116, 139, 0.35);
+    --table-header-text: #0f172a;
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+}
+
+@media (max-width: 768px) {
+    main.content-area {
+        flex: 1 0 auto !important;
+        min-height: calc(100vh - 70px) !important;
+        padding: 20px 20px 110px !important;
+    }
+
+    .module-sticky-header {
+        position: sticky;
+        top: 85px;
+    }
+
+    .management-card.master-card {
+        flex: 0 0 auto !important;
+        min-height: 300px !important;
+        height: auto !important;
+        max-height: none !important;
+        margin: 16px auto !important;
+        width: calc(100% - 24px) !important;
+        max-width: calc(100% - 24px) !important;
+    }
+
+    .master-table-wrapper {
+        flex: 0 1 auto !important;
+        max-height: calc(100vh - 300px);
+    }
+
+    .master-table-wrapper thead th {
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+    }
+}

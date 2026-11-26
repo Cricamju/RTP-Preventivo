@@ -1,5 +1,5 @@
-/* static/css/base_private.css */
-@import url('accessibility.css');
+/* static/css/base/base_private.css */
+@import url('../components/accessibility.css');
 
 :root {
     --rtp-green: #009345; 
@@ -18,7 +18,7 @@ body {
     padding: 0;
     padding-top: 85px;
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background-image: url('../RTP-Login.png');
+    background-image: url('/static/img/fondos/public/RTP-Login-Dark.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -29,11 +29,102 @@ body {
     flex-direction: column;
 }
 
+body.theme-admin { background-image: url('/static/img/fondos/admin/RTP-Admin-Dark.png'); }
+body.theme-editor { background-image: url('/static/img/fondos/editor/RTP-Editor-Dark.png'); }
+body.theme-consulta { background-image: url('/static/img/fondos/consulta/RTP-Consulta-Dark.png'); }
+
+body.light-theme.theme-admin { background-image: url('/static/img/fondos/admin/RTP-Admin.png'); }
+body.light-theme.theme-editor { background-image: url('/static/img/fondos/editor/RTP-Editor.png'); }
+body.light-theme.theme-consulta { background-image: url('/static/img/fondos/consulta/RTP-Consulta.png'); }
+
 .overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: -1;
+}
+
+main.content-area {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    min-width: 0;
+    width: calc(100% - 75px);
+    margin-left: 75px;
+    padding: 40px;
+}
+
+main.content-area > * {
+    min-width: 0;
+    max-width: 100%;
+}
+
+footer.glass-panel {
+    width: calc(100% - 75px);
+    margin-left: 75px;
+    margin-top: auto;
+    padding: 15px 24px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--glass-border);
+    z-index: 10;
+}
+
+.welcome-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 760px;
+    margin: 0 auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 100%;
+}
+
+.dashboard-card {
+    width: min(100%, 760px);
+    max-width: 760px;
+    margin: auto;
+    padding: clamp(24px, 4vw, 36px);
+}
+
+.dashboard-card ul {
+    padding-left: 24px;
+    line-height: 1.65;
+}
+
+.dashboard-card li + li {
+    margin-top: 5px;
+}
+
+.dashboard-list {
+    color: var(--text-muted);
+    line-height: 1.65;
+}
+
+.help-section-title {
+    margin: 24px 0 8px;
+    color: var(--rtp-green);
+    font-size: 1rem;
+}
+
+.help-support-note {
+    margin-bottom: 0;
+}
+
+.welcome-card h2 {
+    color: var(--rtp-green);
+    margin-top: 0;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
 }
 
 header {
@@ -131,7 +222,10 @@ body.light-theme .user-dropdown {
 }
 
 /* =========================================
-   SIDEBAR TIPO OPERA GX
+   SUBMENÚ DESPLEGABLE EN SIDEBAR
+   ========================================= */
+/* =========================================
+   SIDEBAR TIPO OPERA GX + SUBMENÚ REPORTES
    ========================================= */
 .sidebar {
     position: fixed;
@@ -140,21 +234,24 @@ body.light-theme .user-dropdown {
     width: 75px;
     height: calc(100vh - 85px);
     background: var(--glass-bg);
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-right: 1px solid var(--glass-border);
     z-index: 900;
     display: flex;
     flex-direction: column;
-    padding: 20px 0;
-    overflow: hidden;
-    white-space: nowrap;
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     justify-content: space-between;
+    padding: 20px 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    white-space: nowrap;
+    transition: width 0.28s ease-out;
 }
 
-.sidebar:hover {
+.sidebar:hover,
+.sidebar.expanded {
     width: 18rem;
-    box-shadow: 10px 0 30px rgba(0,0,0,0.3);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
 }
 
 .sidebar-nav {
@@ -171,7 +268,7 @@ body.light-theme .user-dropdown {
     font-size: 0.95rem;
     display: flex;
     align-items: center;
-    transition: all 0.3s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
     border-left: 4px solid transparent;
 }
 
@@ -195,98 +292,213 @@ body.light-theme .user-dropdown {
 .sidebar-link .text {
     margin-left: 15px;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transform: none;
+    transition: opacity 0.24s ease;
 }
 
-.sidebar:hover .sidebar-link .text {
+.sidebar:hover .sidebar-link .text,
+.sidebar.expanded .sidebar-link .text {
+    opacity: 1;
+    transition-delay: 0.04s;
+}
+
+.sidebar-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-toggle {
+    width: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    position: relative;
+}
+
+.submenu-arrow {
+    margin-left: auto;
+    font-size: 0.85rem;
+    opacity: 0;
+    transform: rotate(0deg);
+    transition: transform 0.25s ease, opacity 0.2s ease;
+}
+
+.sidebar:hover .submenu-arrow,
+.sidebar.expanded .submenu-arrow {
     opacity: 1;
     transition-delay: 0.1s;
 }
 
-main.content-area {
-    margin-left: 75px;
-    padding: 40px;
-    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.sidebar-group.open .submenu-arrow {
+    transform: rotate(180deg);
+}
+
+.sidebar-submenu {
+    max-height: 0;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
+    background: rgba(0, 0, 0, 0.22);
+    transition: max-height 0.3s ease;
 }
 
-footer.glass-panel {
-    padding: 15px;
-    text-align: center;
-    font-size: 0.85rem;
+body.light-theme .sidebar-submenu {
+    background: rgba(0, 147, 69, 0.06);
+}
+
+.sidebar-group.open .sidebar-submenu {
+    max-height: 240px;
+}
+
+.sidebar-sublink {
+    padding: 11px 18px 11px 34px;
     color: var(--text-muted);
-    width: 100%;
-    background: var(--glass-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-top: 1px solid var(--glass-border);
-    margin-top: auto;
-    z-index: 10;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-left: 4px solid transparent;
+    transition: opacity 0.24s ease, background-color 0.2s ease, color 0.2s ease;
+    opacity: 0;
 }
 
-body.theme-admin { background-image: url('/static/img/fondos/admin/RTP-Admin-Dark.png'); }
-body.theme-editor { background-image: url('/static/img/fondos/editor/RTP-Editor-Dark.png'); }
-body.theme-consulta { background-image: url('/static/img/fondos/consulta/RTP-Consulta-Dark.png'); }
-
-body.light-theme.theme-admin { background-image: url('/static/img/fondos/admin/RTP-Admin.png') !important; }
-body.light-theme.theme-editor { background-image: url('/static/img/fondos/editor/RTP-Editor.png') !important; }
-body.light-theme.theme-consulta { background-image: url('/static/img/fondos/consulta/RTP-Consulta.png') !important; }
-
-.welcome-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 40px;
-    max-width: 800px;
-    margin: 0 auto;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    width: 100%;
+.sidebar:hover .sidebar-sublink,
+.sidebar.expanded .sidebar-sublink {
+    opacity: 1;
+    transition-delay: 0.04s;
 }
 
-.welcome-card h2 {
+.sidebar-sublink:hover {
+    background: rgba(0, 147, 69, 0.14);
+    color: var(--text-light);
+}
+
+body.light-theme .sidebar-sublink {
+    color: #334155;
+}
+
+body.light-theme .sidebar-sublink:hover {
     color: var(--rtp-green);
-    margin-top: 0;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 15px;
+}
+
+.sidebar-sublink.active {
+    border-left-color: var(--rtp-green);
+    background: rgba(0, 147, 69, 0.2);
+    color: var(--rtp-green);
+    font-weight: 600;
+}
+
+.sub-icon {
+    font-size: 1rem;
+    min-width: 20px;
+    text-align: center;
+}
+
+@media (min-width: 769px) {
+    .sidebar:not(:hover):not(.expanded) .sidebar-link {
+        justify-content: flex-start;
+        padding: 15px 22px;
+    }
+
+    .sidebar:not(:hover):not(.expanded) .sidebar-link .text {
+        opacity: 0;
+        transition-delay: 0s;
+    }
+
+    .sidebar:not(:hover):not(.expanded) .sidebar-link .icon {
+        display: inline-flex;
+        flex: 0 0 30px;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .sidebar:not(:hover):not(.expanded) .sidebar-toggle .submenu-arrow {
+        display: none;
+    }
+
+    .sidebar:not(:hover):not(.expanded) .sidebar-group.open:not(.current) .sidebar-submenu {
+        max-height: 0;
+        padding: 0;
+        pointer-events: none;
+    }
+
+    .sidebar:not(:hover):not(.expanded) .sidebar-group.current .sidebar-submenu {
+        max-height: 150px;
+        padding: 2px 0;
+        pointer-events: auto;
+    }
+
+    .sidebar:not(:hover):not(.expanded) .sidebar-group.current .sidebar-sublink {
+        justify-content: center;
+        padding: 7px 0;
+        opacity: 1;
+    }
+
+    .sidebar:not(:hover):not(.expanded) .sidebar-group.current .sidebar-sublink .text {
+        display: none;
+    }
+
+    .sidebar:not(:hover):not(.expanded) .sidebar-group.current .sub-icon {
+        min-width: 20px;
+        font-size: 0.9rem;
+    }
+
+    .sidebar:not(:hover):not(.expanded) .sidebar-group.current .sidebar-sublink {
+        min-height: 40px;
+        padding-top: 9px;
+        padding-bottom: 9px;
+    }
+
+    .sidebar:hover .sidebar-group.current .sidebar-submenu,
+    .sidebar.expanded .sidebar-group.current .sidebar-submenu {
+        max-height: 240px;
+        pointer-events: auto;
+    }
+
+    .sidebar:hover .sidebar-group.open .sidebar-submenu,
+    .sidebar.expanded .sidebar-group.open .sidebar-submenu {
+        pointer-events: auto;
+    }
 }
 
 @media (max-width: 768px) {
-    header {
-        padding: 10px 20px;
-        height: 70px;
-    }
-    header h1 {
-        display: none;
-    }
-    
-    main.content-area {
-        margin-left: 0;
-        padding: 20px;
-        padding-bottom: 110px; 
-        min-height: calc(100vh - 70px);
-    }
-
     .sidebar {
         top: auto;
-        bottom: 20px; 
+        bottom: 20px;
         left: 50%;
-        transform: translateX(-50%); 
-        width: 92%; 
+        transform: translateX(-50%);
+        width: 92%;
         height: 65px;
-        border-radius: 35px; 
+        border-radius: 35px;
         flex-direction: row;
         justify-content: space-evenly;
         padding: 0;
-        overflow: hidden;
+        overflow: visible;
         border: 1px solid rgba(255, 255, 255, 0.2);
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
         transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), bottom 0.4s ease !important;
+    }
+
+    main.content-area {
+        width: 100%;
+        margin-left: 0;
+        padding: 20px;
+        padding-bottom: 110px;
+        min-height: calc(100vh - 85px);
+    }
+
+    footer.glass-panel {
+        width: 100%;
+        margin-left: 0;
+        margin-bottom: 85px;
+        padding: 15px;
     }
 
     .sidebar:hover,
@@ -299,45 +511,38 @@ body.light-theme.theme-consulta { background-image: url('/static/img/fondos/cons
         transform: translate(-50%, 150%);
         bottom: -100px;
     }
-    
+
     .sidebar.sidebar-at-bottom {
         bottom: 75px;
     }
 
-    .sidebar-nav {
-        flex-direction: row;
-        justify-content: space-evenly;
-        align-items: center;
-        width: 100%;
-        gap: 0;
-        display: contents;
-    }
-    
+    .sidebar-nav,
     .sidebar-bottom {
-        display: flex;
-        align-items: center;
-        margin-right: 5px;
         display: contents;
     }
 
     .sidebar-link {
         flex: 1;
         padding: 10px 0;
-        border-left: none; 
-        flex-direction: column; 
+        border-left: none;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        border-radius: 0; 
+        border-radius: 0;
         height: 100%;
     }
 
-    .sidebar-link .text {
-        display: none; 
+    .sidebar-link .text,
+    .submenu-arrow,
+    .sidebar-sublink .text {
+        display: none;
     }
 
     .sidebar-link .icon {
         margin-left: 0;
         font-size: 1.4rem;
+        opacity: 1;
+        visibility: visible;
     }
 
     .sidebar-link.active {
@@ -347,19 +552,52 @@ body.light-theme.theme-consulta { background-image: url('/static/img/fondos/cons
         box-shadow: none;
     }
 
-    .sidebar-link.active .icon {
-        color: var(--rtp-green);
+    .sidebar-group {
+        position: relative;
+        flex: 1;
+        height: 100%;
     }
 
-    .a11y-container {
-        bottom: 100px;
-        right: 15px;
-        transform: scale(0.85);
+    .sidebar-toggle {
+        height: 100%;
     }
 
-    .user-dropdown {
-        top: 65px;
-        right: 20px;
-        width: 180px;
+    .sidebar-submenu {
+        position: fixed;
+        bottom: 92px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 360px;
+        max-height: 0;
+        border-radius: 14px;
+        background: rgba(18, 24, 20, 0.96);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+        z-index: 1050;
+    }
+
+    body.light-theme .sidebar-submenu {
+        background: rgba(255, 255, 255, 0.96);
+        border-color: rgba(0, 147, 69, 0.3);
+    }
+
+    .sidebar-group.open .sidebar-submenu {
+        max-height: 220px;
+        padding: 6px;
+    }
+
+    .sidebar-sublink {
+        opacity: 1;
+        padding: 10px 14px;
+        border-left: none;
+        border-radius: 8px;
+        justify-content: flex-start;
+        font-size: 0.9rem;
+    }
+
+    .sidebar-sublink .text {
+        display: inline;
     }
 }

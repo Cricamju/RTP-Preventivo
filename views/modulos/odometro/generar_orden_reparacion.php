@@ -24,7 +24,7 @@ function obtenerPdfManual($modelo) {
     if (strpos($m, 'masa') !== false) return 'MASA.pdf';
     if (strpos($m, 'cosmopolitan') !== false) return 'Cosmopolitan.pdf';
     if (strpos($m, 'procity') !== false) return 'procity2016.pdf';
-    if (strpos($m, 'mercedes') || strpos($m, 'mb_torino') !== false) return 'MB_TORINO.pdf';
+    if (strpos($m, 'mercedes') !== false || strpos($m, 'mb_torino') !== false) return 'MB_TORINO.pdf';
     if (strpos($m, 'torino') !== false) return 'torino_volvo.pdf';
     return 'Acces2020.pdf';
 }
@@ -42,22 +42,73 @@ if ($color_semaforo === 'amarillo') {
     $bgHex = 'rgba(239, 68, 68, 0.12)';
 }
 ?>
-<link rel="stylesheet" href="/static/css/modulos/correctivo.css?v=4.1">
+<link rel="stylesheet" href="/static/css/modulos/generar_orden_reparacion.css?v=1.2">
 
+<style>
+    #btn-volver-dinamico {
+        cursor: pointer;
+        border: 1.5px solid #10b981;
+        background: rgba(0, 147, 69, 0.35);
+        color: #ffffff;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        transition: all 0.2s ease;
+    }
+    #btn-volver-dinamico:hover {
+        background: rgba(0, 147, 69, 0.6);
+        transform: translateY(-1px);
+    }
+
+    body.light-theme #btn-volver-dinamico {
+        color: #000000 !important;
+        background: rgba(0, 147, 69, 0.15) !important;
+        border-color: #009345 !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+    body.light-theme #btn-volver-dinamico:hover {
+        background: rgba(0, 147, 69, 0.25) !important;
+        color: #000000 !important;
+    }
+</style>
+
+<!-- TOPBAR REACOMODADO -->
 <div class="correctivo-sticky-header">
-    <div class="header-content-inline">
-        <div class="inline-title">
-            <h2>⚙️ Generación de Orden de Reparación</h2>
+    <div class="header-content-inline" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        
+        <div class="inline-controls" style="flex: 1; text-align: left;">
+            <button onclick="history.back()" id="btn-volver-dinamico">
+                <span id="btn-volver-texto">⬅️ Volver</span>
+            </button>
         </div>
-        <div class="inline-controls">
-            <a href="/odometro" class="btn-volver-capsule">
-                <span>🔙 Volver a Odómetros</span>
-            </a>
+        
+        <div class="inline-title" style="flex: 2; text-align: center;">
+            <h2 style="margin: 0; font-size: 1.3rem; color: var(--rtp-green); font-weight: 700;">⚙️ Generación de Orden de Reparación</h2>
         </div>
+
+        <div style="flex: 1;"></div>
     </div>
 </div>
 
-<div class="management-card correctivo-card" style="max-width: 900px; margin: 90px auto 60px auto; padding: 25px;">
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const referrer = document.referrer;
+        const textoSpan = document.getElementById("btn-volver-texto");
+        
+        if (referrer.includes("ordenes-reparacion") || referrer.includes("correctivo")) {
+            textoSpan.innerText = "⬅️ Volver a Órdenes";
+        } else {
+            textoSpan.innerText = "⬅️ Volver a Odómetros";
+        }
+    });
+</script>
+
+<div class="management-card correctivo-card">
     <div class="document-container" style="text-align: center;">
         
         <div class="doc-header" style="display: flex; align-items: center; gap: 20px; border-bottom: 2px solid var(--rtp-green); padding-bottom: 15px; margin-bottom: 20px; text-align: left;">
@@ -93,12 +144,12 @@ if ($color_semaforo === 'amarillo') {
                     </thead>
                     <tbody>
                         <tr>
-                            <td style="padding: 8px; text-align: center;"><strong><?php echo htmlspecialchars($economico); ?></strong></td>
-                            <td style="padding: 8px; text-align: center;"><?php echo htmlspecialchars($modelo_unidad); ?></td>
-                            <td style="padding: 8px; text-align: center;"><?php echo htmlspecialchars($fecha_odo); ?></td>
-                            <td style="padding: 8px; text-align: center;"><?php echo htmlspecialchars($km_odo); ?></td>
-                            <td style="padding: 8px; text-align: center;">
-                                <span style="background: <?php echo $bgHex; ?>; color: <?php echo $colorHex; ?>; border: 1px solid <?php echo $colorHex; ?>; padding: 4px 10px; border-radius: 6px; font-weight: bold;">
+                            <td data-label="Económico" style="padding: 8px; text-align: center;"><strong><?php echo htmlspecialchars($economico); ?></strong></td>
+                            <td data-label="Modelo / unidad" style="padding: 8px; text-align: center;"><?php echo htmlspecialchars($modelo_unidad); ?></td>
+                            <td data-label="Fecha odómetro" style="padding: 8px; text-align: center;"><?php echo htmlspecialchars($fecha_odo); ?></td>
+                            <td data-label="Kilometraje [Km]" style="padding: 8px; text-align: center;"><?php echo htmlspecialchars($km_odo); ?></td>
+                            <td data-label="Servicio sugerido" style="padding: 8px; text-align: center;">
+                                <span style="background: <?php echo $bgHex; ?>; color: <?php echo $colorHex; ?>; border: 1.5px solid <?php echo $colorHex; ?>; padding: 4px 10px; border-radius: 6px; font-weight: bold;">
                                     <?php echo htmlspecialchars($servicio_sugerido); ?>
                                 </span>
                             </td>
@@ -114,14 +165,15 @@ if ($color_semaforo === 'amarillo') {
                 📝 DATOS DE LA ORDEN DE REPARACIÓN
             </div>
                         
-            <form action="/guardar-orden" method="POST" class="order-form">
+            <form action="/guardar-orden" method="POST" class="order-form" id="form-guardar-orden">
                 <!-- Datos esenciales -->
                 <input type="hidden" name="economico" value="<?php echo htmlspecialchars($economico); ?>">
                 <input type="hidden" name="modulo" value="<?php echo htmlspecialchars($modulo); ?>">
                 <input type="hidden" name="tipo_servicio" value="<?php echo htmlspecialchars($servicio_sugerido); ?>">
                 <input type="hidden" name="modelo" value="<?php echo htmlspecialchars($modelo_unidad); ?>">
+                <input type="hidden" name="color" value="<?php echo htmlspecialchars($color_semaforo); ?>">
                 
-                <!-- Campos dinámicos recibidos desde el odómetro -->
+                <!-- Campos dinámicos -->
                 <input type="hidden" name="fecha_odo" value="<?php echo htmlspecialchars($fecha_odo); ?>">
                 <input type="hidden" name="km_odo" value="<?php echo htmlspecialchars($km_odo); ?>">
                 <input type="hidden" name="fecha_mant" value="<?php echo htmlspecialchars($fecha_mant); ?>">
@@ -150,7 +202,7 @@ if ($color_semaforo === 'amarillo') {
                 </div>
 
                 <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-                    <a href="/odometro" class="btn-action-cancel" style="padding: 9px 18px; background: #6b7280; color: white; border-radius: 8px; text-decoration: none; font-size: 0.9rem;">Cancelar</a>
+                    <button type="button" onclick="history.back()" class="btn-action-cancel" style="padding: 9px 18px; background: #6b7280; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">Cancelar</button>
                     <button type="submit" class="btn-action-save" style="padding: 9px 18px; background: var(--rtp-green); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">💾 Salvar Orden</button>
                 </div>
             </form>
@@ -158,3 +210,6 @@ if ($color_semaforo === 'amarillo') {
 
     </div>
 </div>
+
+<!-- Script independiente exclusivo para esta vista -->
+<script src="/static/js/modulos/generar_orden_reparacion.js?v=1.0"></script>

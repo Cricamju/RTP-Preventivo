@@ -5,6 +5,21 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 $role = $_SESSION['rol'] ?? 'consulta';
 $username = $_SESSION['username'] ?? 'Usuario';
+$user_modulo = $_SESSION['modulo_usuario'] ?? '';
+
+// Formatear el texto del módulo para que se vea amigable
+if ($user_modulo === 'central') {
+    $moduloTexto = '🏢 Oficinas Centrales';
+} elseif (!empty($user_modulo)) {
+    $moduloTexto = 'Módulo ' . str_pad($user_modulo, 2, '0', STR_PAD_LEFT);
+} else {
+    $moduloTexto = 'Sin Módulo Asignado';
+}
+
+
+// Formatear el rol con su debida capitalización
+$roleLower = strtolower($role);
+$rolTexto = ucfirst($roleLower);
 
 $requestPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $currentModuleCss = '';
@@ -17,14 +32,30 @@ switch ($requestPath) {
         $currentModuleCss = '/static/css/modulos/gsp.css';
         break;
     case '/orden-reparacion':
+        $currentModuleCss = '/static/css/modulos/generar_orden_reparacion.css';
+        break;
     case '/ordenes-reparacion':
     case '/correctivo':
-        $currentModuleCss = '/static/css/modulos/correctivo.css';
+        $currentModuleCss = '/static/css/modulos/ordenes_reparacion.css';
         break;
     case '/gestion-usuarios':
         $currentModuleCss = '/static/css/modulos/gestion_usuarios.css';
         break;
+    case '/reportes':
+    case '/reportes/servicios-preventivos':
+        $currentModuleCss = '/static/css/modulos/reportes/servicios_preventivos.css';
+        break;
+    case '/reportes/historicos-km-preventivos':
+        $currentModuleCss = '/static/css/modulos/reportes/historicos_km_preventivos.css';
+        break;
+    case '/reportes/historicos-dia-dia':
+        $currentModuleCss = '/static/css/modulos/reportes/historicos_dia_dia.css';
+        break;
 }
+
+$isReportesRoute = str_starts_with($requestPath, '/reportes');
+
+
 ?>
 <!DOCTYPE html>
 <html lang="es-MX">
@@ -34,11 +65,11 @@ switch ($requestPath) {
     <title><?= htmlspecialchars($page_title ?? 'Intranet') ?> | RTP-Preventivo</title>
     <link rel="icon" href="/static/img/logos/main_logo.png" type="image/png">
     
-    <link rel="stylesheet" href="/static/css/base/base_private.css">
+    <link rel="stylesheet" href="/static/css/base/base_private.css?v=9.0">
     <link rel="stylesheet" href="/static/css/components/accessibility.css">
 
     <?php if (!empty($currentModuleCss)): ?>
-        <link rel="stylesheet" href="<?= $currentModuleCss ?>?v=3.0">
+        <link rel="stylesheet" href="<?= $currentModuleCss ?>?v=12.0">
     <?php endif; ?>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -55,28 +86,36 @@ switch ($requestPath) {
             <h1>SISTEMA DE MANTENIMIENTO RTP</h1>
         </a>
         
-        <div class="header-right">
-            <div class="user-profile-wrapper" id="user-profile-btn">
-                <div class="user-profile">
-                    👤 <span style="margin-left: 8px;" class="username-text"><?= htmlspecialchars($username) ?></span> <span class="dropdown-arrow">▾</span>
+        <!-- 🟢 CONTENEDOR DERECHO CON MAYOR ESPACIADO -->
+        <div class="header-right" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+            <div class="user-profile-wrapper" id="user-profile-btn" style="cursor: pointer; text-align: center;">
+                <div class="user-profile" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <span>👤</span> 
+                    <span class="username-text" style="font-weight: bold;"><?= htmlspecialchars($username) ?></span> 
+                    <span class="dropdown-arrow">▾</span>
+                </div>
+                <!-- 🟢 MÓDULO Y ROL CON MARGEN SUPERIOR AUMENTADO -->
+                <div class="user-profile-meta" style="font-size: 0.75rem; color: var(--text-muted, #9ca3af); margin-top: 10px; text-align: center; line-height: 1.2;">
+                    <?= htmlspecialchars($moduloTexto) ?> - <span style="font-weight: 600;"><?= htmlspecialchars($rolTexto) ?></span>
                 </div>
             </div>
         </div>
     </header>
 
-    <div id="user-dropdown" class="user-dropdown">
-        <a href="/logout" class="dropdown-link">
+    <!-- 🟢 MENÚ DESPLEGABLE CENTRADO CON RESPECTO AL PERFIL -->
+    <div id="user-dropdown" class="user-dropdown" style="text-align: center;">
+        <a href="/logout" class="dropdown-link" style="display: block; width: 100%; text-align: center;">
             🚪 Cerrar Sesión
         </a>
     </div>
 
     <nav id="sidebar" class="sidebar">
         <div class="sidebar-nav">
-            <a href="/dashboard/<?= strtolower($role) ?>" class="sidebar-link <?= ($requestPath === '/dashboard/' . strtolower($role)) ? 'active' : '' ?>">
+            <a href="/dashboard/<?= $roleLower ?>" class="sidebar-link <?= ($requestPath === '/dashboard/' . $roleLower) ? 'active' : '' ?>">
                 <span class="icon">🏠</span> <span class="text">Inicio</span>
             </a>
             
-            <?php if (strtolower($role) === 'admin' || strtolower($role) === 'editor'): ?>
+            <?php if ($roleLower === 'admin' || $roleLower === 'editor'): ?>
                 <a href="/odometro" class="sidebar-link <?= ($requestPath === '/odometro') ? 'active' : '' ?>">
                     <span class="icon">⏱️</span> <span class="text">Captura de Odómetro</span>
                 </a>
@@ -85,13 +124,31 @@ switch ($requestPath) {
                 </a>
             <?php endif; ?>
 
-            <?php if (strtolower($role) === 'admin' || strtolower($role) === 'consulta'): ?>
-                <a href="/reportes" class="sidebar-link <?= ($requestPath === '/reportes') ? 'active' : '' ?>">
-                    <span class="icon">📊</span> <span class="text">Generar Reportes</span>
-                </a>
+            <?php if ($roleLower === 'admin' || $roleLower === 'consulta'): ?>
+                <div class="sidebar-group <?= $isReportesRoute ? 'open current' : '' ?>" id="reportes-group">
+                    <button type="button" class="sidebar-link sidebar-toggle <?= $isReportesRoute ? 'active' : '' ?>" id="btn-toggle-reportes" aria-expanded="<?= $isReportesRoute ? 'true' : 'false' ?>">
+                        <span class="icon">📊</span>
+                        <span class="text">Generar Reportes</span>
+                        <span class="submenu-arrow">▾</span>
+                    </button>
+                    <div class="sidebar-submenu" id="reportes-submenu">
+                        <a href="/reportes/servicios-preventivos" class="sidebar-sublink <?= ($requestPath === '/reportes/servicios-preventivos' || $requestPath === '/reportes') ? 'active' : '' ?>">
+                            <span class="sub-icon">🛠️</span>
+                            <span class="text">Servicios Preventivos</span>
+                        </a>
+                        <a href="/reportes/historicos-km-preventivos" class="sidebar-sublink <?= ($requestPath === '/reportes/historicos-km-preventivos') ? 'active' : '' ?>">
+                            <span class="sub-icon">📈</span>
+                            <span class="text">Históricos KM y Preventivos</span>
+                        </a>
+                        <a href="/reportes/historicos-dia-dia" class="sidebar-sublink <?= ($requestPath === '/reportes/historicos-dia-dia') ? 'active' : '' ?>">
+                            <span class="sub-icon">📅</span>
+                            <span class="text">Históricos KM Día Día</span>
+                        </a>
+                    </div>
+                </div>
             <?php endif; ?>
 
-            <?php if (strtolower($role) === 'admin'): ?>
+            <?php if ($roleLower === 'admin'): ?>
                 <a href="/gestion-usuarios" class="sidebar-link <?= ($requestPath === '/gestion-usuarios') ? 'active' : '' ?>">
                     <span class="icon">👥</span> <span class="text">Gestión de Usuarios</span>
                 </a>

@@ -1,0 +1,93 @@
+/* /static/css/components/comparison-fab.css */
+
+/* Keep the action bar aligned with accessibility and leave a clear gap between them. */
+.rtp-fab-container {
+    position: fixed;
+    bottom: 30px;
+    right: 120px;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(15, 23, 42, 0.85); /* Tono oscuro por defecto */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    min-height: 60px;
+    padding: 8px 14px;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Botones individuales del FAB (Modo Oscuro) */
+.rtp-fab-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #f8fafc;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease-in-out;
+}
+
+.rtp-fab-btn:hover {
+    background: var(--rtp-green, #009345);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 147, 69, 0.4);
+}
+
+.rtp-fab-btn.clear:hover {
+    background: #ef4444;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.fab-hidden {
+    transform: translateY(100px);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* 4) ADAPTACIÓN DUAL THEME PARA MODO CLARO */
+body.light-theme .rtp-fab-container {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+body.light-theme .rtp-fab-btn {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #0f172a;
+}
+
+body.light-theme .rtp-fab-btn:hover {
+    background: var(--rtp-green, #009345);
+    color: #ffffff;
+}
+
+@media (max-width: 768px) {
+    .rtp-fab-container {
+        right: 100px;
+        bottom: 30px;
+        max-width: calc(100vw - 130px);
+        gap: 6px;
+        padding: 6px 8px;
+    }
+
+    .rtp-fab-btn {
+        padding: 8px 10px;
+    }
+}
+
+@media (max-width: 600px) {
+    .rtp-fab-btn .fab-label {
+        display: none;
+    }
+}

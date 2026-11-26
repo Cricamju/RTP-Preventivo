@@ -314,3 +314,26 @@ body.light-theme .input-group input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 30px #ffffff inset !important;
     -webkit-text-fill-color: #111827 !important;
 }
+
+/* =========================================
+   ESTILOS DE UI: ESPACIADO Y CENTRADO EN USUARIOS
+   ========================================= */
+
+/* 1. Ampliar el espacio vertical (padding) entre los renglones de la tabla */
+.users-table td, 
+.users-table th {
+    padding: 22px 14px !important; /* Renglones más separados y cómodos a la vista */
+    vertical-align: middle;
+}
+
+/* 2. Centrar completamente el contenido de la columna 'Rol / Asignación' */
+.users-table td:nth-child(3),
+.users-table th:nth-child(3) {
+    text-align: center !important;
+}
+
+/* 3. Darle un pequeño respiro vertical entre la etiqueta del rol y el módulo asignado */
+.users-table td:nth-child(3) .role-badge {
+    display: inline-block;
+    margin-bottom: 6px;
+}

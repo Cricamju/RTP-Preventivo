@@ -1,9 +1,10 @@
-<div class="welcome-card">
-    <h2>Panel de Consulta y Análisis</h2>
-    <p>Bienvenido al módulo de visor. Tienes acceso de solo lectura para:</p>
+<div class="welcome-card dashboard-card">
+    <h2>📊 Panel de Consulta</h2>
+    <p>Desde tu perfil puedes revisar la información de la flota y consultar reportes en modo de solo lectura.</p>
     <ul>
-        <li>Visualizar el estatus de la flota.</li>
-        <li>Generar y exportar los reportes de mantenimiento.</li>
+        <li>🛠️ Consultar servicios preventivos.</li>
+        <li>📈 Revisar históricos de kilometraje y mantenimiento.</li>
+        <li>📄 Exportar los resultados disponibles a Excel o PDF.</li>
     </ul>
-    <p><em>Dirígete a la sección de "Generar Reportes" en el menú para continuar.</em></p>
+    <p><em>Abre “Generar Reportes” en el menú lateral y selecciona el reporte que necesitas.</em></p>
 </div>

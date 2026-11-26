@@ -1,10 +1,4 @@
-# Arquitectura y macroflujo de RTP-Preventivo
-
-**Tecnología indicada:** PHP 8.2, PostgreSQL mediante PDO y arquitectura MVC ligera.
-
-**Propósito:** representar el recorrido general de una solicitud desde su entrada al sistema hasta la respuesta HTTP, incluyendo autenticación, autorización por roles (RBAC), ejecución de módulos y respuestas finales. El orden exacto de los pasos debe coincidir con la implementación real.
-
-## 1. Macrodiagrama general
+# Arquitectura y Macroflujo de RTP-Preventivo (Actualizado con Puntos 1 al 9)
 
 ```mermaid
 flowchart TD
@@ -12,94 +6,93 @@ flowchart TD
         A["Usuario / navegador"]
     end
 
-    subgraph ENRUTADOR["2. Entrada y enrutamiento - index.php"]
-        B["Recibir solicitud HTTP y leer REQUEST_URI y método"]
+    subgraph ENRUTADOR["2. Entrada y enrutamiento (index.php)"]
+        B["Recibir solicitud y lectura de REQUEST_URI"]
+        
+        %% Punto 2: Validación de datos de entrada para evitar errores
+        VAL["Validación y sanitización de datos de entrada"]
+        
         C{"¿La ruta es pública? <br/> (/ o /login)"}
-        A --> B --> C
+        A --> B --> VAL --> C
 
-        C -- "Sí" --> D{"¿Es un POST de credenciales de login?"}
-        D -- "Sí" --> E["Obtener acceso a PDO y consultar la cuenta en PostgreSQL"]
-        E --> F{"¿Se encontró la cuenta?"}
+        C -- "Sí" --> D{"¿Es POST de credenciales de login?"}
+        
+        %% Punto 6: Manejo de errores de conexión a Base de Datos
+        subgraph DB_AUTH["Autenticación y BD"]
+            E["Consultar cuenta en PostgreSQL (PDO)"]
+            DBERR{"¿Error de conexión <br/> o fallo de BD?"}
+            DBERR -- "Sí" --> RESDB["Respuesta HTTP 500: Error interno de BD"]
+        end
 
-        F -- "No" --> NOUSER["Preparar error genérico de autenticación"]
-        F -- "Sí" --> G{"¿La cuenta tiene un bloqueo temporal activo?"}
-        G -- "Sí" --> BLOCK["Rechazar el inicio de sesión por bloqueo activo"]
-        G -- "No" --> H{"¿password_verify() valida la contraseña?"}
+        D -- "Sí" --> E --> DBERR
+        DBERR -- "No" --> F{"¿Se encontró la cuenta?"}
 
-        H -- "No" --> INC["Incrementar el contador de intentos fallidos"]
-        INC --> J{"¿El contador alcanzó el límite configurado?"}
-        J -- "Sí" --> K["Registrar el bloqueo temporal en la base de datos"]
-        J -- "No" --> L["Preparar respuesta de credenciales incorrectas"]
+        F -- "No" --> NOUSER["Respuesta genérica de autenticación"]
+        F -- "Sí" --> G{"¿Bloqueo temporal activo?"}
+        G -- "Sí" --> BLOCK["Rechazar sesión por bloqueo activo"]
+        G -- "No" --> H{"¿password_verify() es válido?"}
 
-        H -- "Sí" --> M["Restablecer intentos; regenerar ID de sesión e inicializar $_SESSION"]
-        M --> N["Preparar redirección al dashboard del rol"]
+        %% Punto 3: Manejo de contraseña incorrecta varias veces y bloqueo
+        H -- "No" --> INC["Incrementar contador de intentos fallidos"]
+        INC --> J{"¿Límite de intentos superado?"}
+        J -- "Sí" --> K["Aplicar tiempo de bloqueo temporal y registrar en BD"]
+        J -- "No" --> L["Respuesta de credenciales incorrectas"]
 
-        D -- "No" --> O{"¿Existe una sesión autenticada válida?"}
-        O -- "Sí" --> P["Preparar redirección al dashboard del rol"]
-        O -- "No" --> Q["Preparar formulario de inicio de sesión"]
+        %% Punto 4: Regeneración de sesión al autenticar con éxito
+        H -- "Sí" --> M["Regenerar ID de sesión (session_regenerate_id) e inicializar $_SESSION"]
+        M --> N["Redirección al dashboard del rol"]
 
-        C -- "No" --> R{"¿Existe una sesión autenticada válida?"}
-        R -- "No" --> S["Emitir redirección HTTP a /login"]
-        R -- "Sí" --> T["Resolver la ruta privada solicitada"]
+        %% Punto 4: Manejo de sesiones expiradas o cierre de sesión
+        D -- "No" --> O{"¿Sesión activa y válida? <br/> (Control de expiración / logout)"}
+        O -- "Sí" --> P["Redirección al dashboard"]
+        O -- "No" --> Q["Renderizar formulario de login"]
+
+        C -- "No" --> R{"¿Existe sesión autenticada válida?"}
+        R -- "No" --> S["Redirección HTTP a /login <br/> (Sesión expirada o nula)"]
+        R -- "Sí" --> T["Resolver ruta privada solicitada"]
     end
 
-    subgraph AUTORIZACION["3. Resolución y autorización"]
-        T --> U{"¿Existe la ruta o el módulo solicitado?"}
-        U -- "No" --> V["Preparar respuesta HTTP 404"]
-        U -- "Sí" --> W["Comprobar permisos del rol para la ruta"]
-        W --> X{"¿El usuario está autorizado?"}
-        X -- "No" --> Y["Preparar respuesta HTTP 403"]
-        X -- "Sí" --> Z{"¿Qué módulo corresponde?"}
+    subgraph AUTORIZACION["3. Resolución y Autorización (RBAC)"]
+        T --> U{"¿Existe ruta o módulo?"}
+        U -- "No" --> V["Respuesta HTTP 404 <br/> (Ruta no encontrada)"]
+        U -- "Sí" --> W{"¿El rol tiene permisos <br/> para la ruta?"}
+        
+        %% Punto 5: Reforzar permisos para que cada usuario acceda solo a lo permitido
+        W -- "No" --> Y["Respuesta HTTP 403 <br/> (Acceso denegado / Sin permisos)"]
+        W -- "Sí" --> Z{"¿Qué módulo corresponde?"}
     end
 
     subgraph MODULOS["4. Módulos de la aplicación"]
-        Z -- "Odómetro" --> MOD1["Odómetro<br/>Filtros, edición y exportación, según corresponda"]
-        Z -- "GSP" --> MOD2["GSP / control preventivo<br/>Estado de flota, según corresponda"]
-        Z -- "Órdenes" --> MOD3["Órdenes de reparación<br/>Búsqueda y formato de salida, según corresponda"]
-        Z -- "Usuarios" --> MOD4["Gestión de usuarios<br/>CRUD, roles y gestión de intentos, según corresponda"]
-        Z -- "Reportes / ayuda" --> MOD5["Reportes y ayuda"]
+        %% Punto 8: Registros de actividad (bitácora de accesos, intentos y acciones)
+        Z -- "Odómetro" --> LOG["Registrar bitácora: Accesos, intentos y acciones importantes"]
+        Z -- "GSP" --> LOG
+        Z -- "Órdenes" --> LOG
+        Z -- "Usuarios" --> LOG
+        Z -- "Reportes" --> LOG
 
-        MOD1 --> EXEC["Ejecutar controlador, acción y lógica del módulo"]
-        MOD2 --> EXEC
-        MOD3 --> EXEC
-        MOD4 --> EXEC
-        MOD5 --> EXEC
-        EXEC --> OUT{"¿Qué tipo de respuesta produce la acción?"}
+        LOG --> EXEC["Ejecutar controlador y lógica de negocio"]
+        
+        %% Punto 5: Permisos operativos internos (consulta, edición, eliminación)
+        EXEC --> PERMOP{"¿Permisos para acción <br/> específica permitida?"}
+        PERMOP -- "No" --> Y
+        PERMOP -- "Sí" --> OUT{"¿Tipo de respuesta?"}
     end
 
     subgraph RESPUESTAS["5. Respuestas HTTP al cliente"]
-        BLOCK --> RLOCK["Respuesta de bloqueo temporal"]
+        BLOCK --> RLOCK["HTTP 423 / Bloqueo temporal"]
         K --> RLOCK
-        NOUSER --> RFAIL["Respuesta genérica de autenticación fallida"]
+        NOUSER --> RFAIL["Mensaje de autenticación fallida"]
         L --> RFAIL
-        N --> RDASH["Redirección HTTP al dashboard del rol"]
+        N --> RDASH["Redirección HTTP a Dashboard"]
         P --> RDASH
-        Q --> RLOGIN["Renderizar formulario HTML de login"]
+        Q --> RLOGIN["HTML Form Login"]
         S --> RTOLOGIN["Redirección HTTP a /login"]
-        V --> R404["Respuesta HTTP 404 - No encontrado"]
-        Y --> R403["Respuesta HTTP 403 - Acceso denegado"]
+        V --> R404["HTTP 404 Not Found"]
+        Y --> R403["HTTP 403 Forbidden"]
+        RESDB --> R500["HTTP 500 Internal Server Error"]
 
-        OUT -- "Vista HTML" --> RHTML["Renderizar la vista con views/base.php, si corresponde"]
-        OUT -- "Redirección" --> RREDIR["Emitir redirección HTTP sin renderizar el layout"]
-        OUT -- "Archivo" --> RFILE["Enviar archivo o exportación sin renderizar el layout"]
-        OUT -- "Otra respuesta" --> ROTHER["Emitir la respuesta correspondiente, por ejemplo JSON o texto"]
+        OUT -- "Vista HTML" --> RHTML["Renderizar vista con views/base.php"]
+        OUT -- "Redirección" --> RREDIR["Redirección HTTP sin layout"]
+        OUT -- "Archivo" --> RFILE["Enviar archivo o exportación"]
+        OUT -- "Otra" --> ROTHER["Respuesta JSON o texto"]
     end
-```
-
-## 2. Notas técnicas y puntos de verificación
-
-- **Enrutamiento:** confirmar que `index.php` recibe las solicitudes y clasifica las rutas públicas y privadas como se muestra.
-- **PDO:** comprobar cuándo se carga `config/database.php` y cuándo se establece la conexión. El diagrama no presupone que toda solicitud abra una conexión si el código no lo hace.
-- **Autenticación:** validar el orden real de búsqueda de la cuenta, comprobación del bloqueo, uso de `password_verify()` y actualización de los intentos.
-- **Cuenta inexistente:** esta versión separa la cuenta no encontrada de los fallos de contraseña y no la pasa por el contador, siguiendo la descripción proporcionada por la auditoría de Gemini. Confirmar que el código haga exactamente eso.
-- **Contador y bloqueo:** el flujo supone que se incrementa el contador después de una contraseña incorrecta y luego se evalúa el límite. Confirmar el orden, el umbral y la duración del bloqueo en la implementación; esos valores no se fijan en este documento.
-- **Sesiones:** comprobar que `session_regenerate_id()` y la inicialización de `$_SESSION` ocurran después de autenticar correctamente.
-- **Autorización:** verificar si la aplicación comprueba primero la existencia de la ruta y luego los permisos, como se dibuja, y si protege también las operaciones sensibles dentro de cada módulo.
-- **Respuestas terminales:** comprobar que los flujos 403 y 404 realmente detengan la ejecución y no continúen hacia los módulos.
-- **MVC y layout:** confirmar que el controlador ejecuta la lógica antes de renderizar `views/base.php`, y que las redirecciones y salidas de archivos omiten el layout.
-- **Rutas públicas con sesión:** verificar que una sesión válida al visitar `/` o `/login` provoca una redirección al dashboard del rol.
-- **Consideración de seguridad:** si la respuesta por cuenta bloqueada es distinta de la respuesta por credenciales incorrectas, evaluar si esa diferencia puede revelar la existencia de una cuenta. La decisión debe documentarse según el comportamiento y los requisitos reales.
-
-## 3. Alcance y criterio de aceptación
-
-Este es un macrodiagrama, no un diagrama de clases ni una auditoría completa de seguridad. Debe considerarse definitivo solo después de contrastar las ramas, nombres, condiciones y respuestas con el código fuente. Las recomendaciones que no estén implementadas deben mantenerse como observaciones y no presentarse como controles existentes.
